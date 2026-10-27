@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "empty-state",
+  "type": "registry:block",
+  "title": "Empty State",
+  "description": "Universal empty state placeholder with centered icon container, title, description, primary CTA button, and secondary link.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "devDependencies": [],
+  "registryDependencies": [
+    "utils",
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/empty-state.tsx",
+      "content": "import * as React from \"react\"\nimport { FolderPlus, LucideIcon } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\n\nexport interface EmptyStateProps {\n  icon?: LucideIcon | React.ComponentType<{ className?: string }>\n  title: string\n  description?: string\n  action?: {\n    label: string\n    onClick?: () => void\n    href?: string\n  }\n  secondaryAction?: {\n    label: string\n    onClick?: () => void\n    href?: string\n  }\n  className?: string\n  children?: React.ReactNode\n}\n\nexport function EmptyState({\n  icon: Icon = FolderPlus,\n  title,\n  description,\n  action,\n  secondaryAction,\n  className,\n  children,\n}: EmptyStateProps) {\n  return (\n    <div\n      className={cn(\n        \"flex min-h-[360px] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center animate-in fade-in-50\",\n        className\n      )}\n    >\n      <div className=\"mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted/60 text-muted-foreground ring-8 ring-muted/30\">\n        <Icon className=\"h-7 w-7\" />\n      </div>\n\n      <h3 className=\"mt-5 text-lg font-semibold tracking-tight text-foreground\">\n        {title}\n      </h3>\n\n      {description && (\n        <p className=\"mt-2 text-sm text-muted-foreground max-w-sm text-balance\">\n          {description}\n        </p>\n      )}\n\n      {(action || secondaryAction || children) && (\n        <div className=\"mt-6 flex flex-wrap items-center justify-center gap-3\">\n          {action && (\n            <Button\n              size=\"sm\"\n              onClick={action.onClick}\n              asChild={!!action.href}\n            >\n              {action.href ? <a href={action.href}>{action.label}</a> : action.label}\n            </Button>\n          )}\n\n          {secondaryAction && (\n            <Button\n              variant=\"outline\"\n              size=\"sm\"\n              onClick={secondaryAction.onClick}\n              asChild={!!secondaryAction.href}\n            >\n              {secondaryAction.href ? (\n                <a href={secondaryAction.href}>{secondaryAction.label}</a>\n              ) : (\n                secondaryAction.label\n              )}\n            </Button>\n          )}\n\n          {children}\n        </div>\n      )}\n    </div>\n  )\n}\n",
+      "type": "registry:block",
+      "target": "components/blocks/empty-state.tsx"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {}
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@strophix/lumen-registry",
+  "version": "0.1.0",
+  "description": "Official component and block registry for Lumen (Tailwind CSS v4 + React 19 + Radix UI)",
+  "type": "module",
+  "homepage": "https://github.com/strophix-software/lumen-registry",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/strophix-software/lumen-registry.git"
+  },
+  "scripts": {
+    "build": "node scripts/build-registry.mjs",
+    "validate": "node scripts/validate-registry.mjs",
+    "test": "node scripts/validate-registry.mjs"
+  },
+  "keywords": [
+    "lumen",
+    "shadcn",
+    "tailwind-v4",
+    "react-19",
+    "radix-ui",
+    "registry",
+    "components",
+    "blocks"
+  ],
+  "author": "Jose Romero <jrlara4739@gmail.com>",
+  "license": "MIT"
+}

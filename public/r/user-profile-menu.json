@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "user-profile-menu",
+  "type": "registry:block",
+  "title": "User Profile Menu",
+  "description": "Universal user avatar dropdown menu with profile details, settings, nested theme selector (light/dark/system), and logout.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "devDependencies": [],
+  "registryDependencies": [
+    "utils",
+    "avatar",
+    "button",
+    "dropdown-menu",
+    "badge"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/user-profile-menu.tsx",
+      "content": "import * as React from \"react\"\nimport {\n  User,\n  CreditCard,\n  Settings,\n  Users,\n  Keyboard,\n  Moon,\n  Sun,\n  Laptop,\n  LogOut,\n} from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\nimport { Button } from \"@/components/ui/button\"\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuGroup,\n  DropdownMenuItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuShortcut,\n  DropdownMenuSub,\n  DropdownMenuSubContent,\n  DropdownMenuSubTrigger,\n  DropdownMenuTrigger,\n} from \"@/components/ui/dropdown-menu\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport interface UserProfileMenuProps {\n  user: {\n    name: string\n    email: string\n    avatar?: string\n    role?: string\n    initials?: string\n  }\n  onNavigate?: (path: string) => void\n  onThemeSelect?: (theme: \"light\" | \"dark\" | \"system\") => void\n  onLogout?: () => void\n  align?: \"start\" | \"center\" | \"end\"\n}\n\nexport function UserProfileMenu({\n  user,\n  onNavigate,\n  onThemeSelect,\n  onLogout,\n  align = \"end\",\n}: UserProfileMenuProps) {\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"ghost\" className=\"relative h-9 w-9 rounded-full p-0\">\n          <Avatar className=\"h-9 w-9\">\n            {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}\n            <AvatarFallback>{user.initials ?? user.name.slice(0, 2).toUpperCase()}</AvatarFallback>\n          </Avatar>\n        </Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-56\" align={align} forceMount>\n        <DropdownMenuLabel className=\"font-normal\">\n          <div className=\"flex flex-col space-y-1\">\n            <div className=\"flex items-center justify-between\">\n              <p className=\"text-sm font-semibold leading-none\">{user.name}</p>\n              {user.role && (\n                <Badge variant=\"outline\" className=\"text-[10px] px-1 py-0 uppercase\">\n                  {user.role}\n                </Badge>\n              )}\n            </div>\n            <p className=\"text-xs leading-none text-muted-foreground truncate\">\n              {user.email}\n            </p>\n          </div>\n        </DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuGroup>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/profile\")}>\n            <User className=\"mr-2 h-4 w-4\" />\n            <span>Profile</span>\n            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/billing\")}>\n            <CreditCard className=\"mr-2 h-4 w-4\" />\n            <span>Billing</span>\n            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/settings\")}>\n            <Settings className=\"mr-2 h-4 w-4\" />\n            <span>Settings</span>\n            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/team\")}>\n            <Users className=\"mr-2 h-4 w-4\" />\n            <span>Team</span>\n          </DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        {onThemeSelect && (\n          <DropdownMenuSub>\n            <DropdownMenuSubTrigger>\n              <Sun className=\"mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0\" />\n              <Moon className=\"absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100\" />\n              <span>Theme</span>\n            </DropdownMenuSubTrigger>\n            <DropdownMenuSubContent>\n              <DropdownMenuItem onClick={() => onThemeSelect(\"light\")}>\n                <Sun className=\"mr-2 h-4 w-4\" />\n                <span>Light</span>\n              </DropdownMenuItem>\n              <DropdownMenuItem onClick={() => onThemeSelect(\"dark\")}>\n                <Moon className=\"mr-2 h-4 w-4\" />\n                <span>Dark</span>\n              </DropdownMenuItem>\n              <DropdownMenuItem onClick={() => onThemeSelect(\"system\")}>\n                <Laptop className=\"mr-2 h-4 w-4\" />\n                <span>System</span>\n              </DropdownMenuItem>\n            </DropdownMenuSubContent>\n          </DropdownMenuSub>\n        )}\n        <DropdownMenuSeparator />\n        <DropdownMenuItem onClick={onLogout} className=\"text-destructive focus:text-destructive\">\n          <LogOut className=\"mr-2 h-4 w-4\" />\n          <span>Log out</span>\n          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>\n        </DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )\n}\n",
+      "type": "registry:block",
+      "target": "components/blocks/user-profile-menu.tsx"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {}
+}

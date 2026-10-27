@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "auth-split",
+  "type": "registry:block",
+  "title": "Auth Split Layout",
+  "description": "Split authentication screen with branded showcase/testimonial panel on left and form slot with terms on right.",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/auth-split.tsx",
+      "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\n\nexport interface AuthSplitProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n    href?: string\n  }\n  testimonial?: {\n    quote: string\n    author: string\n    role?: string\n  }\n  topAction?: {\n    text: string\n    linkText: string\n    href: string\n  }\n  children: React.ReactNode\n}\n\nexport function AuthSplit({\n  brand = { name: \"Lumen\" },\n  testimonial = {\n    quote: \"This architecture transformed our delivery velocity. Building production-grade products has never been this seamless.\",\n    author: \"Sofia Chen\",\n    role: \"VP of Engineering at Acme\",\n  },\n  topAction = {\n    text: \"Don't have an account?\",\n    linkText: \"Sign up\",\n    href: \"#signup\",\n  },\n  children,\n}: AuthSplitProps) {\n  return (\n    <div className=\"relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0 bg-background text-foreground\">\n      {/* Brand & Testimonial Hero Column */}\n      <div className=\"relative hidden h-full flex-col justify-between bg-zinc-950 p-10 text-white lg:flex dark:border-r border-border\">\n        {/* Subtle decorative background gradient */}\n        <div className=\"absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))]\" />\n        \n        <div className=\"relative z-20 flex items-center gap-2 text-lg font-bold\">\n          {brand.logo ?? (\n            <div className=\"flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-950 font-black text-base\">\n              L\n            </div>\n          )}\n          <span>{brand.name}</span>\n        </div>\n\n        <div className=\"relative z-20 mt-auto\">\n          <blockquote className=\"space-y-2\">\n            <p className=\"text-lg leading-relaxed text-zinc-300\">\n              &ldquo;{testimonial.quote}&rdquo;\n            </p>\n            <footer className=\"text-sm\">\n              <span className=\"font-semibold text-white\">{testimonial.author}</span>\n              {testimonial.role && (\n                <span className=\"text-zinc-400\"> &mdash; {testimonial.role}</span>\n              )}\n            </footer>\n          </blockquote>\n        </div>\n      </div>\n\n      {/* Auth Form Column */}\n      <div className=\"flex min-h-screen flex-col justify-between p-6 sm:p-12 lg:p-16\">\n        {topAction && (\n          <div className=\"flex justify-end text-sm text-muted-foreground\">\n            <span>{topAction.text} </span>\n            <a\n              href={topAction.href}\n              className=\"ml-1 font-semibold text-foreground underline underline-offset-4 hover:opacity-80\"\n            >\n              {topAction.linkText}\n            </a>\n          </div>\n        )}\n\n        <div className=\"mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]\">\n          {children}\n        </div>\n\n        <p className=\"px-8 text-center text-xs text-muted-foreground\">\n          By clicking continue, you agree to our{\" \"}\n          <a href=\"#terms\" className=\"underline underline-offset-4 hover:text-foreground\">\n            Terms of Service\n          </a>{\" \"}\n          and{\" \"}\n          <a href=\"#privacy\" className=\"underline underline-offset-4 hover:text-foreground\">\n            Privacy Policy\n          </a>\n          .\n        </p>\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:block",
+      "target": "components/blocks/auth-split.tsx"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {}
+}

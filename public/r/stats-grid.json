@@ -1,0 +1,26 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stats-grid",
+  "type": "registry:block",
+  "title": "Stats Grid",
+  "description": "Responsive KPI metrics overview grid with trend badges (increase/decrease/neutral), icons, and descriptions.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "devDependencies": [],
+  "registryDependencies": [
+    "utils",
+    "card",
+    "badge"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/stats-grid.tsx",
+      "content": "import * as React from \"react\"\nimport { TrendingUp, TrendingDown, Minus } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport interface StatItem {\n  id?: string\n  title: string\n  value: string | number\n  change?: {\n    value: string\n    type: \"increase\" | \"decrease\" | \"neutral\"\n  }\n  description?: string\n  icon?: React.ComponentType<{ className?: string }>\n}\n\nexport interface StatsGridProps {\n  stats: StatItem[]\n  columns?: 2 | 3 | 4\n  className?: string\n}\n\nexport function StatCard({ item }: { item: StatItem }) {\n  const Icon = item.icon\n\n  return (\n    <Card className=\"relative overflow-hidden\">\n      <CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">\n        <CardTitle className=\"text-sm font-medium text-muted-foreground\">\n          {item.title}\n        </CardTitle>\n        {Icon && (\n          <div className=\"flex h-8 w-8 items-center justify-center rounded-md bg-muted text-muted-foreground\">\n            <Icon className=\"h-4 w-4\" />\n          </div>\n        )}\n      </CardHeader>\n      <CardContent>\n        <div className=\"text-2xl font-bold tracking-tight\">{item.value}</div>\n\n        {(item.change || item.description) && (\n          <div className=\"mt-2 flex items-center gap-2 text-xs\">\n            {item.change && (\n              <Badge\n                variant={\n                  item.change.type === \"increase\"\n                    ? \"success\"\n                    : item.change.type === \"decrease\"\n                    ? \"destructive\"\n                    : \"secondary\"\n                }\n                className=\"gap-1 px-1.5 py-0 font-medium\"\n              >\n                {item.change.type === \"increase\" && <TrendingUp className=\"h-3 w-3\" />}\n                {item.change.type === \"decrease\" && <TrendingDown className=\"h-3 w-3\" />}\n                {item.change.type === \"neutral\" && <Minus className=\"h-3 w-3\" />}\n                <span>{item.change.value}</span>\n              </Badge>\n            )}\n            {item.description && (\n              <span className=\"text-muted-foreground truncate\">{item.description}</span>\n            )}\n          </div>\n        )}\n      </CardContent>\n    </Card>\n  )\n}\n\nexport function StatsGrid({ stats, columns = 4, className }: StatsGridProps) {\n  const gridColsClass =\n    columns === 2\n      ? \"sm:grid-cols-2\"\n      : columns === 3\n      ? \"sm:grid-cols-2 lg:grid-cols-3\"\n      : \"sm:grid-cols-2 lg:grid-cols-4\"\n\n  return (\n    <div className={cn(\"grid grid-cols-1 gap-4\", gridColsClass, className)}>\n      {stats.map((stat, idx) => (\n        <StatCard key={stat.id ?? idx} item={stat} />\n      ))}\n    </div>\n  )\n}\n",
+      "type": "registry:block",
+      "target": "components/blocks/stats-grid.tsx"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {}
+}

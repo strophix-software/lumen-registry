@@ -1,0 +1,962 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "lumen",
+  "homepage": "https://github.com/strophix-software/lumen-registry",
+  "items": [
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "Utils",
+      "description": "Utility function (cn) merging clsx and tailwind-merge.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "lib/utils.ts",
+          "content": "import { clsx, type ClassValue } from \"clsx\"\nimport { twMerge } from \"tailwind-merge\"\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs))\n}\n",
+          "type": "registry:lib",
+          "target": "lib/utils.ts"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "use-mobile",
+      "type": "registry:hook",
+      "title": "useIsMobile",
+      "description": "React hook to detect mobile viewport (< 768px).",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "hooks/use-mobile.ts",
+          "content": "import * as React from \"react\"\n\nconst MOBILE_BREAKPOINT = 768\n\nexport function useIsMobile() {\n  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)\n\n  React.useEffect(() => {\n    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)\n    const onChange = () => {\n      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)\n    }\n    mql.addEventListener(\"change\", onChange)\n    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)\n    return () => mql.removeEventListener(\"change\", onChange)\n  }, [])\n\n  return !!isMobile\n}\n",
+          "type": "registry:hook",
+          "target": "hooks/use-mobile.ts"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "use-debounce",
+      "type": "registry:hook",
+      "title": "useDebounce",
+      "description": "React hook to debounce fast-changing state values.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "hooks/use-debounce.ts",
+          "content": "import * as React from \"react\"\n\nexport function useDebounce<T>(value: T, delay: number = 300): T {\n  const [debouncedValue, setDebouncedValue] = React.useState<T>(value)\n\n  React.useEffect(() => {\n    const timer = setTimeout(() => setDebouncedValue(value), delay)\n    return () => clearTimeout(timer)\n  }, [value, delay])\n\n  return debouncedValue\n}\n",
+          "type": "registry:hook",
+          "target": "hooks/use-debounce.ts"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Displays a button or a component that looks like a button.",
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/button.tsx",
+          "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst buttonVariants = cva(\n  \"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0\",\n  {\n    variants: {\n      variant: {\n        default:\n          \"bg-primary text-primary-foreground shadow hover:bg-primary/90\",\n        destructive:\n          \"bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90\",\n        outline:\n          \"border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground\",\n        secondary:\n          \"bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80\",\n        ghost: \"hover:bg-accent hover:text-accent-foreground\",\n        link: \"text-primary underline-offset-4 hover:underline\",\n      },\n      size: {\n        default: \"h-9 px-4 py-2\",\n        sm: \"h-8 rounded-md px-3 text-xs\",\n        lg: \"h-10 rounded-md px-8\",\n        icon: \"h-9 w-9\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n      size: \"default\",\n    },\n  }\n)\n\nexport interface ButtonProps\n  extends React.ButtonHTMLAttributes<HTMLButtonElement>,\n    VariantProps<typeof buttonVariants> {\n  asChild?: boolean\n}\n\nconst Button = React.forwardRef<HTMLButtonElement, ButtonProps>(\n  ({ className, variant, size, asChild = false, ...props }, ref) => {\n    const Comp = asChild ? Slot : \"button\"\n    return (\n      <Comp\n        className={cn(buttonVariants({ variant, size, className }))}\n        ref={ref}\n        {...props}\n      />\n    )\n  }\n)\nButton.displayName = \"Button\"\n\nexport { Button, buttonVariants }\n",
+          "type": "registry:ui",
+          "target": "components/ui/button.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Displays a form input field or a component that looks like an input field.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/input.tsx",
+          "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Input = React.forwardRef<HTMLInputElement, React.ComponentProps<\"input\">>(\n  ({ className, type, ...props }, ref) => {\n    return (\n      <input\n        type={type}\n        className={cn(\n          \"flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm\",\n          className\n        )}\n        ref={ref}\n        {...props}\n      />\n    )\n  }\n)\nInput.displayName = \"Input\"\n\nexport { Input }\n",
+          "type": "registry:ui",
+          "target": "components/ui/input.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "Renders an accessible label associated with controls.",
+      "dependencies": [
+        "@radix-ui/react-label",
+        "class-variance-authority"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/label.tsx",
+          "content": "import * as React from \"react\"\nimport * as LabelPrimitive from \"@radix-ui/react-label\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst labelVariants = cva(\n  \"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n)\n\nconst Label = React.forwardRef<\n  React.ElementRef<typeof LabelPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n    VariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n  <LabelPrimitive.Root\n    ref={ref}\n    className={cn(labelVariants(), className)}\n    {...props}\n  />\n))\nLabel.displayName = LabelPrimitive.Root.displayName\n\nexport { Label }\n",
+          "type": "registry:ui",
+          "target": "components/ui/label.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Displays a card with header, content, and footer.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/card.tsx",
+          "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Card = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement>\n>(({ className, ...props }, ref) => (\n  <div\n    ref={ref}\n    className={cn(\n      \"rounded-xl border bg-card text-card-foreground shadow-sm\",\n      className\n    )}\n    {...props}\n  />\n))\nCard.displayName = \"Card\"\n\nconst CardHeader = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement>\n>(({ className, ...props }, ref) => (\n  <div\n    ref={ref}\n    className={cn(\"flex flex-col space-y-1.5 p-6\", className)}\n    {...props}\n  />\n))\nCardHeader.displayName = \"CardHeader\"\n\nconst CardTitle = React.forwardRef<\n  HTMLParagraphElement,\n  React.HTMLAttributes<HTMLHeadingElement>\n>(({ className, ...props }, ref) => (\n  <h3\n    ref={ref}\n    className={cn(\"font-semibold leading-none tracking-tight\", className)}\n    {...props}\n  />\n))\nCardTitle.displayName = \"CardTitle\"\n\nconst CardDescription = React.forwardRef<\n  HTMLParagraphElement,\n  React.HTMLAttributes<HTMLParagraphElement>\n>(({ className, ...props }, ref) => (\n  <p\n    ref={ref}\n    className={cn(\"text-sm text-muted-foreground\", className)}\n    {...props}\n  />\n))\nCardDescription.displayName = \"CardDescription\"\n\nconst CardContent = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement>\n>(({ className, ...props }, ref) => (\n  <div ref={ref} className={cn(\"p-6 pt-0\", className)} {...props} />\n))\nCardContent.displayName = \"CardContent\"\n\nconst CardFooter = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement>\n>(({ className, ...props }, ref) => (\n  <div\n    ref={ref}\n    className={cn(\"flex items-center p-6 pt-0\", className)}\n    {...props}\n  />\n))\nCardFooter.displayName = \"CardFooter\"\n\nconst CardAction = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement>\n>(({ className, ...props }, ref) => (\n  <div\n    ref={ref}\n    className={cn(\"ml-auto flex items-center gap-2\", className)}\n    {...props}\n  />\n))\nCardAction.displayName = \"CardAction\"\n\nexport { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, CardAction }\n",
+          "type": "registry:ui",
+          "target": "components/ui/card.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Displays a badge or a component that looks like a badge.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/badge.tsx",
+          "content": "import * as React from \"react\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst badgeVariants = cva(\n  \"inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2\",\n  {\n    variants: {\n      variant: {\n        default:\n          \"border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80\",\n        secondary:\n          \"border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80\",\n        destructive:\n          \"border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80\",\n        outline: \"text-foreground\",\n        success:\n          \"border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20\",\n        warning:\n          \"border-transparent bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/20\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n    },\n  }\n)\n\nexport interface BadgeProps\n  extends React.HTMLAttributes<HTMLDivElement>,\n    VariantProps<typeof badgeVariants> {}\n\nfunction Badge({ className, variant, ...props }: BadgeProps) {\n  return (\n    <div className={cn(badgeVariants({ variant }), className)} {...props} />\n  )\n}\n\nexport { Badge, badgeVariants }\n",
+          "type": "registry:ui",
+          "target": "components/ui/badge.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A modal dialog that interrupts the user with important content and expects a response.",
+      "dependencies": [
+        "@radix-ui/react-dialog",
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/dialog.tsx",
+          "content": "import * as React from \"react\"\nimport * as DialogPrimitive from \"@radix-ui/react-dialog\"\nimport { X } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Dialog = DialogPrimitive.Root\nconst DialogTrigger = DialogPrimitive.Trigger\nconst DialogPortal = DialogPrimitive.Portal\nconst DialogClose = DialogPrimitive.Close\n\nconst DialogOverlay = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Overlay>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>\n>(({ className, ...props }, ref) => (\n  <DialogPrimitive.Overlay\n    ref={ref}\n    className={cn(\n      \"fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0\",\n      className\n    )}\n    {...props}\n  />\n))\nDialogOverlay.displayName = DialogPrimitive.Overlay.displayName\n\nconst DialogContent = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>\n>(({ className, children, ...props }, ref) => (\n  <DialogPortal>\n    <DialogOverlay />\n    <DialogPrimitive.Content\n      ref={ref}\n      className={cn(\n        \"fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg\",\n        className\n      )}\n      {...props}\n    >\n      {children}\n      <DialogPrimitive.Close className=\"absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground\">\n        <X className=\"h-4 w-4\" />\n        <span className=\"sr-only\">Close</span>\n      </DialogPrimitive.Close>\n    </DialogPrimitive.Content>\n  </DialogPortal>\n))\nDialogContent.displayName = DialogPrimitive.Content.displayName\n\nconst DialogHeader = ({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLDivElement>) => (\n  <div\n    className={cn(\n      \"flex flex-col space-y-1.5 text-center sm:text-left\",\n      className\n    )}\n    {...props}\n  />\n)\nDialogHeader.displayName = \"DialogHeader\"\n\nconst DialogFooter = ({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLDivElement>) => (\n  <div\n    className={cn(\n      \"flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2\",\n      className\n    )}\n    {...props}\n  />\n)\nDialogFooter.displayName = \"DialogFooter\"\n\nconst DialogTitle = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Title>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>\n>(({ className, ...props }, ref) => (\n  <DialogPrimitive.Title\n    ref={ref}\n    className={cn(\n      \"text-lg font-semibold leading-none tracking-tight\",\n      className\n    )}\n    {...props}\n  />\n))\nDialogTitle.displayName = DialogPrimitive.Title.displayName\n\nconst DialogDescription = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Description>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>\n>(({ className, ...props }, ref) => (\n  <DialogPrimitive.Description\n    ref={ref}\n    className={cn(\"text-sm text-muted-foreground\", className)}\n    {...props}\n  />\n))\nDialogDescription.displayName = DialogPrimitive.Description.displayName\n\nexport {\n  Dialog,\n  DialogPortal,\n  DialogOverlay,\n  DialogTrigger,\n  DialogClose,\n  DialogContent,\n  DialogHeader,\n  DialogFooter,\n  DialogTitle,\n  DialogDescription,\n}\n",
+          "type": "registry:ui",
+          "target": "components/ui/dialog.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Displays a menu to the user — such as a set of actions or functions — triggered by a button.",
+      "dependencies": [
+        "@radix-ui/react-dropdown-menu",
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/dropdown-menu.tsx",
+          "content": "import * as React from \"react\"\nimport * as DropdownMenuPrimitive from \"@radix-ui/react-dropdown-menu\"\nimport { Check, ChevronRight, Circle } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst DropdownMenu = DropdownMenuPrimitive.Root\nconst DropdownMenuTrigger = DropdownMenuPrimitive.Trigger\nconst DropdownMenuGroup = DropdownMenuPrimitive.Group\nconst DropdownMenuPortal = DropdownMenuPrimitive.Portal\nconst DropdownMenuSub = DropdownMenuPrimitive.Sub\nconst DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup\n\nconst DropdownMenuSubTrigger = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {\n    inset?: boolean\n  }\n>(({ className, inset, children, ...props }, ref) => (\n  <DropdownMenuPrimitive.SubTrigger\n    ref={ref}\n    className={cn(\n      \"flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0\",\n      inset && \"pl-8\",\n      className\n    )}\n    {...props}\n  >\n    {children}\n    <ChevronRight className=\"ml-auto\" />\n  </DropdownMenuPrimitive.SubTrigger>\n))\nDropdownMenuSubTrigger.displayName =\n  DropdownMenuPrimitive.SubTrigger.displayName\n\nconst DropdownMenuSubContent = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.SubContent\n    ref={ref}\n    className={cn(\n      \"z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n      className\n    )}\n    {...props}\n  />\n))\nDropdownMenuSubContent.displayName =\n  DropdownMenuPrimitive.SubContent.displayName\n\nconst DropdownMenuContent = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>\n>(({ className, sideOffset = 4, ...props }, ref) => (\n  <DropdownMenuPrimitive.Portal>\n    <DropdownMenuPrimitive.Content\n      ref={ref}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md\",\n        \"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n        className\n      )}\n      {...props}\n    />\n  </DropdownMenuPrimitive.Portal>\n))\nDropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName\n\nconst DropdownMenuItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Item>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {\n    inset?: boolean\n  }\n>(({ className, inset, ...props }, ref) => (\n  <DropdownMenuPrimitive.Item\n    ref={ref}\n    className={cn(\n      \"relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0\",\n      inset && \"pl-8\",\n      className\n    )}\n    {...props}\n  />\n))\nDropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName\n\nconst DropdownMenuCheckboxItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>\n>(({ className, children, checked, ...props }, ref) => (\n  <DropdownMenuPrimitive.CheckboxItem\n    ref={ref}\n    className={cn(\n      \"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      className\n    )}\n    checked={checked}\n    {...props}\n  >\n    <span className=\"absolute left-2 flex h-3.5 w-3.5 items-center justify-center\">\n      <DropdownMenuPrimitive.ItemIndicator>\n        <Check className=\"h-4 w-4\" />\n      </DropdownMenuPrimitive.ItemIndicator>\n    </span>\n    {children}\n  </DropdownMenuPrimitive.CheckboxItem>\n))\nDropdownMenuCheckboxItem.displayName =\n  DropdownMenuPrimitive.CheckboxItem.displayName\n\nconst DropdownMenuRadioItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>\n>(({ className, children, ...props }, ref) => (\n  <DropdownMenuPrimitive.RadioItem\n    ref={ref}\n    className={cn(\n      \"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      className\n    )}\n    {...props}\n  >\n    <span className=\"absolute left-2 flex h-3.5 w-3.5 items-center justify-center\">\n      <DropdownMenuPrimitive.ItemIndicator>\n        <Circle className=\"h-2 w-2 fill-current\" />\n      </DropdownMenuPrimitive.ItemIndicator>\n    </span>\n    {children}\n  </DropdownMenuPrimitive.RadioItem>\n))\nDropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName\n\nconst DropdownMenuLabel = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Label>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {\n    inset?: boolean\n  }\n>(({ className, inset, ...props }, ref) => (\n  <DropdownMenuPrimitive.Label\n    ref={ref}\n    className={cn(\n      \"px-2 py-1.5 text-sm font-semibold\",\n      inset && \"pl-8\",\n      className\n    )}\n    {...props}\n  />\n))\nDropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName\n\nconst DropdownMenuSeparator = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Separator\n    ref={ref}\n    className={cn(\"-mx-1 my-1 h-px bg-muted\", className)}\n    {...props}\n  />\n))\nDropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName\n\nconst DropdownMenuShortcut = ({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLSpanElement>) => {\n  return (\n    <span\n      className={cn(\"ml-auto text-xs tracking-widest opacity-60\", className)}\n      {...props}\n    />\n  )\n}\nDropdownMenuShortcut.displayName = \"DropdownMenuShortcut\"\n\nexport {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuCheckboxItem,\n  DropdownMenuRadioItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuShortcut,\n  DropdownMenuGroup,\n  DropdownMenuPortal,\n  DropdownMenuSub,\n  DropdownMenuSubContent,\n  DropdownMenuSubTrigger,\n  DropdownMenuRadioGroup,\n}\n",
+          "type": "registry:ui",
+          "target": "components/ui/dropdown-menu.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "An image element with a fallback for representing the user.",
+      "dependencies": [
+        "@radix-ui/react-avatar"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/avatar.tsx",
+          "content": "import * as React from \"react\"\nimport * as AvatarPrimitive from \"@radix-ui/react-avatar\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Avatar = React.forwardRef<\n  React.ElementRef<typeof AvatarPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>\n>(({ className, ...props }, ref) => (\n  <AvatarPrimitive.Root\n    ref={ref}\n    className={cn(\n      \"relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full\",\n      className\n    )}\n    {...props}\n  />\n))\nAvatar.displayName = AvatarPrimitive.Root.displayName\n\nconst AvatarImage = React.forwardRef<\n  React.ElementRef<typeof AvatarPrimitive.Image>,\n  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>\n>(({ className, ...props }, ref) => (\n  <AvatarPrimitive.Image\n    ref={ref}\n    className={cn(\"aspect-square h-full w-full\", className)}\n    {...props}\n  />\n))\nAvatarImage.displayName = AvatarPrimitive.Image.displayName\n\nconst AvatarFallback = React.forwardRef<\n  React.ElementRef<typeof AvatarPrimitive.Fallback>,\n  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>\n>(({ className, ...props }, ref) => (\n  <AvatarPrimitive.Fallback\n    ref={ref}\n    className={cn(\n      \"flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground\",\n      className\n    )}\n    {...props}\n  />\n))\nAvatarFallback.displayName = AvatarPrimitive.Fallback.displayName\n\nexport { Avatar, AvatarImage, AvatarFallback }\n",
+          "type": "registry:ui",
+          "target": "components/ui/avatar.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "A set of layered sections of content — known as tab panels — that are displayed one at a time.",
+      "dependencies": [
+        "@radix-ui/react-tabs"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/tabs.tsx",
+          "content": "import * as React from \"react\"\nimport * as TabsPrimitive from \"@radix-ui/react-tabs\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Tabs = TabsPrimitive.Root\n\nconst TabsList = React.forwardRef<\n  React.ElementRef<typeof TabsPrimitive.List>,\n  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>\n>(({ className, ...props }, ref) => (\n  <TabsPrimitive.List\n    ref={ref}\n    className={cn(\n      \"inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground\",\n      className\n    )}\n    {...props}\n  />\n))\nTabsList.displayName = TabsPrimitive.List.displayName\n\nconst TabsTrigger = React.forwardRef<\n  React.ElementRef<typeof TabsPrimitive.Trigger>,\n  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>\n>(({ className, ...props }, ref) => (\n  <TabsPrimitive.Trigger\n    ref={ref}\n    className={cn(\n      \"inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm\",\n      className\n    )}\n    {...props}\n  />\n))\nTabsTrigger.displayName = TabsPrimitive.Trigger.displayName\n\nconst TabsContent = React.forwardRef<\n  React.ElementRef<typeof TabsPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>\n>(({ className, ...props }, ref) => (\n  <TabsPrimitive.Content\n    ref={ref}\n    className={cn(\n      \"mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2\",\n      className\n    )}\n    {...props}\n  />\n))\nTabsContent.displayName = TabsPrimitive.Content.displayName\n\nexport { Tabs, TabsList, TabsTrigger, TabsContent }\n",
+          "type": "registry:ui",
+          "target": "components/ui/tabs.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "A responsive table component.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/table.tsx",
+          "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Table = React.forwardRef<\n  HTMLTableElement,\n  React.HTMLAttributes<HTMLTableElement>\n>(({ className, ...props }, ref) => (\n  <div className=\"relative w-full overflow-auto\">\n    <table\n      ref={ref}\n      className={cn(\"w-full caption-bottom text-sm\", className)}\n      {...props}\n    />\n  </div>\n))\nTable.displayName = \"Table\"\n\nconst TableHeader = React.forwardRef<\n  HTMLTableSectionElement,\n  React.HTMLAttributes<HTMLTableSectionElement>\n>(({ className, ...props }, ref) => (\n  <thead ref={ref} className={cn(\"[&_tr]:border-b\", className)} {...props} />\n))\nTableHeader.displayName = \"TableHeader\"\n\nconst TableBody = React.forwardRef<\n  HTMLTableSectionElement,\n  React.HTMLAttributes<HTMLTableSectionElement>\n>(({ className, ...props }, ref) => (\n  <tbody\n    ref={ref}\n    className={cn(\"[&_tr:last-child]:border-0\", className)}\n    {...props}\n  />\n))\nTableBody.displayName = \"TableBody\"\n\nconst TableFooter = React.forwardRef<\n  HTMLTableSectionElement,\n  React.HTMLAttributes<HTMLTableSectionElement>\n>(({ className, ...props }, ref) => (\n  <tfoot\n    ref={ref}\n    className={cn(\n      \"border-t bg-muted/50 font-medium [&>tr]:last:border-b-0\",\n      className\n    )}\n    {...props}\n  />\n))\nTableFooter.displayName = \"TableFooter\"\n\nconst TableRow = React.forwardRef<\n  HTMLTableRowElement,\n  React.HTMLAttributes<HTMLTableRowElement>\n>(({ className, ...props }, ref) => (\n  <tr\n    ref={ref}\n    className={cn(\n      \"border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted\",\n      className\n    )}\n    {...props}\n  />\n))\nTableRow.displayName = \"TableRow\"\n\nconst TableHead = React.forwardRef<\n  HTMLTableCellElement,\n  React.ThHTMLAttributes<HTMLTableCellElement>\n>(({ className, ...props }, ref) => (\n  <th\n    ref={ref}\n    className={cn(\n      \"h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]\",\n      className\n    )}\n    {...props}\n  />\n))\nTableHead.displayName = \"TableHead\"\n\nconst TableCell = React.forwardRef<\n  HTMLTableCellElement,\n  React.TdHTMLAttributes<HTMLTableCellElement>\n>(({ className, ...props }, ref) => (\n  <td\n    ref={ref}\n    className={cn(\n      \"p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]\",\n      className\n    )}\n    {...props}\n  />\n))\nTableCell.displayName = \"TableCell\"\n\nconst TableCaption = React.forwardRef<\n  HTMLTableCaptionElement,\n  React.HTMLAttributes<HTMLTableCaptionElement>\n>(({ className, ...props }, ref) => (\n  <caption\n    ref={ref}\n    className={cn(\"mt-4 text-sm text-muted-foreground\", className)}\n    {...props}\n  />\n))\nTableCaption.displayName = \"TableCaption\"\n\nexport {\n  Table,\n  TableHeader,\n  TableBody,\n  TableFooter,\n  TableHead,\n  TableRow,\n  TableCell,\n  TableCaption,\n}\n",
+          "type": "registry:ui",
+          "target": "components/ui/table.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Visually or semantically separates content.",
+      "dependencies": [
+        "@radix-ui/react-separator"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/separator.tsx",
+          "content": "import * as React from \"react\"\nimport * as SeparatorPrimitive from \"@radix-ui/react-separator\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Separator = React.forwardRef<\n  React.ElementRef<typeof SeparatorPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>\n>(\n  (\n    { className, orientation = \"horizontal\", decorative = true, ...props },\n    ref\n  ) => (\n    <SeparatorPrimitive.Root\n      ref={ref}\n      decorative={decorative}\n      orientation={orientation}\n      className={cn(\n        \"shrink-0 bg-border\",\n        orientation === \"horizontal\" ? \"h-[1px] w-full\" : \"h-full w-[1px]\",\n        className\n      )}\n      {...props}\n    />\n  )\n)\nSeparator.displayName = SeparatorPrimitive.Root.displayName\n\nexport { Separator }\n",
+          "type": "registry:ui",
+          "target": "components/ui/separator.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
+      "dependencies": [
+        "@radix-ui/react-tooltip"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/tooltip.tsx",
+          "content": "import * as React from \"react\"\nimport * as TooltipPrimitive from \"@radix-ui/react-tooltip\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst TooltipProvider = TooltipPrimitive.Provider\nconst Tooltip = TooltipPrimitive.Root\nconst TooltipTrigger = TooltipPrimitive.Trigger\n\nconst TooltipContent = React.forwardRef<\n  React.ElementRef<typeof TooltipPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>\n>(({ className, sideOffset = 4, ...props }, ref) => (\n  <TooltipPrimitive.Portal>\n    <TooltipPrimitive.Content\n      ref={ref}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n        className\n      )}\n      {...props}\n    />\n  </TooltipPrimitive.Portal>\n))\nTooltipContent.displayName = TooltipPrimitive.Content.displayName\n\nexport { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }\n",
+          "type": "registry:ui",
+          "target": "components/ui/tooltip.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Displays a list of options for the user to pick from—triggered by a button.",
+      "dependencies": [
+        "@radix-ui/react-select",
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/select.tsx",
+          "content": "import * as React from \"react\"\nimport * as SelectPrimitive from \"@radix-ui/react-select\"\nimport { Check, ChevronDown, ChevronUp } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Select = SelectPrimitive.Root\nconst SelectGroup = SelectPrimitive.Group\nconst SelectValue = SelectPrimitive.Value\n\nconst SelectTrigger = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.Trigger>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>\n>(({ className, children, ...props }, ref) => (\n  <SelectPrimitive.Trigger\n    ref={ref}\n    className={cn(\n      \"flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1\",\n      className\n    )}\n    {...props}\n  >\n    {children}\n    <SelectPrimitive.Icon asChild>\n      <ChevronDown className=\"h-4 w-4 opacity-50\" />\n    </SelectPrimitive.Icon>\n  </SelectPrimitive.Trigger>\n))\nSelectTrigger.displayName = SelectPrimitive.Trigger.displayName\n\nconst SelectScrollUpButton = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>\n>(({ className, ...props }, ref) => (\n  <SelectPrimitive.ScrollUpButton\n    ref={ref}\n    className={cn(\n      \"flex cursor-default items-center justify-center py-1\",\n      className\n    )}\n    {...props}\n  >\n    <ChevronUp className=\"h-4 w-4\" />\n  </SelectPrimitive.ScrollUpButton>\n))\nSelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName\n\nconst SelectScrollDownButton = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>\n>(({ className, ...props }, ref) => (\n  <SelectPrimitive.ScrollDownButton\n    ref={ref}\n    className={cn(\n      \"flex cursor-default items-center justify-center py-1\",\n      className\n    )}\n    {...props}\n  >\n    <ChevronDown className=\"h-4 w-4\" />\n  </SelectPrimitive.ScrollDownButton>\n))\nSelectScrollDownButton.displayName =\n  SelectPrimitive.ScrollDownButton.displayName\n\nconst SelectContent = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>\n>(({ className, children, position = \"popper\", ...props }, ref) => (\n  <SelectPrimitive.Portal>\n    <SelectPrimitive.Content\n      ref={ref}\n      className={cn(\n        \"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n        position === \"popper\" &&\n          \"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1\",\n        className\n      )}\n      position={position}\n      {...props}\n    >\n      <SelectScrollUpButton />\n      <SelectPrimitive.Viewport\n        className={cn(\n          \"p-1\",\n          position === \"popper\" &&\n            \"h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]\"\n        )}\n      >\n        {children}\n      </SelectPrimitive.Viewport>\n      <SelectScrollDownButton />\n    </SelectPrimitive.Content>\n  </SelectPrimitive.Portal>\n))\nSelectContent.displayName = SelectPrimitive.Content.displayName\n\nconst SelectLabel = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.Label>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>\n>(({ className, ...props }, ref) => (\n  <SelectPrimitive.Label\n    ref={ref}\n    className={cn(\"px-2 py-1.5 text-sm font-semibold\", className)}\n    {...props}\n  />\n))\nSelectLabel.displayName = SelectPrimitive.Label.displayName\n\nconst SelectItem = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.Item>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>\n>(({ className, children, ...props }, ref) => (\n  <SelectPrimitive.Item\n    ref={ref}\n    className={cn(\n      \"relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      className\n    )}\n    {...props}\n  >\n    <span className=\"absolute right-2 flex h-3.5 w-3.5 items-center justify-center\">\n      <SelectPrimitive.ItemIndicator>\n        <Check className=\"h-4 w-4\" />\n      </SelectPrimitive.ItemIndicator>\n    </span>\n    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>\n  </SelectPrimitive.Item>\n))\nSelectItem.displayName = SelectPrimitive.Item.displayName\n\nconst SelectSeparator = React.forwardRef<\n  React.ElementRef<typeof SelectPrimitive.Separator>,\n  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>\n>(({ className, ...props }, ref) => (\n  <SelectPrimitive.Separator\n    ref={ref}\n    className={cn(\"-mx-1 my-1 h-px bg-muted\", className)}\n    {...props}\n  />\n))\nSelectSeparator.displayName = SelectPrimitive.Separator.displayName\n\nexport {\n  Select,\n  SelectGroup,\n  SelectValue,\n  SelectTrigger,\n  SelectContent,\n  SelectLabel,\n  SelectItem,\n  SelectSeparator,\n  SelectScrollUpButton,\n  SelectScrollDownButton,\n}\n",
+          "type": "registry:ui",
+          "target": "components/ui/select.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "A control that allows the user to toggle between checked and not checked.",
+      "dependencies": [
+        "@radix-ui/react-switch"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/switch.tsx",
+          "content": "import * as React from \"react\"\nimport * as SwitchPrimitives from \"@radix-ui/react-switch\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Switch = React.forwardRef<\n  React.ElementRef<typeof SwitchPrimitives.Root>,\n  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>\n>(({ className, ...props }, ref) => (\n  <SwitchPrimitives.Root\n    className={cn(\n      \"peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input\",\n      className\n    )}\n    {...props}\n    ref={ref}\n  >\n    <SwitchPrimitives.Thumb\n      className={cn(\n        \"pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0\"\n      )}\n    />\n  </SwitchPrimitives.Root>\n))\nSwitch.displayName = SwitchPrimitives.Root.displayName\n\nexport { Switch }\n",
+          "type": "registry:ui",
+          "target": "components/ui/switch.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "A control that allows the user to toggle between checked and not checked.",
+      "dependencies": [
+        "@radix-ui/react-checkbox",
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/checkbox.tsx",
+          "content": "import * as React from \"react\"\nimport * as CheckboxPrimitive from \"@radix-ui/react-checkbox\"\nimport { Check } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Checkbox = React.forwardRef<\n  React.ElementRef<typeof CheckboxPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>\n>(({ className, ...props }, ref) => (\n  <CheckboxPrimitive.Root\n    ref={ref}\n    className={cn(\n      \"peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground\",\n      className\n    )}\n    {...props}\n  >\n    <CheckboxPrimitive.Indicator\n      className={cn(\"flex items-center justify-center text-current\")}\n    >\n      <Check className=\"h-4 w-4\" />\n    </CheckboxPrimitive.Indicator>\n  </CheckboxPrimitive.Root>\n))\nCheckbox.displayName = CheckboxPrimitive.Root.displayName\n\nexport { Checkbox }\n",
+          "type": "registry:ui",
+          "target": "components/ui/checkbox.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "Displays a form textarea or a component that looks like a textarea.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/textarea.tsx",
+          "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Textarea = React.forwardRef<\n  HTMLTextAreaElement,\n  React.ComponentProps<\"textarea\">\n>(({ className, ...props }, ref) => {\n  return (\n    <textarea\n      className={cn(\n        \"flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm\",\n        className\n      )}\n      ref={ref}\n      {...props}\n    />\n  )\n})\nTextarea.displayName = \"Textarea\"\n\nexport { Textarea }\n",
+          "type": "registry:ui",
+          "target": "components/ui/textarea.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Displays rich content in a portal, triggered by a button.",
+      "dependencies": [
+        "@radix-ui/react-popover"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/popover.tsx",
+          "content": "import * as React from \"react\"\nimport * as PopoverPrimitive from \"@radix-ui/react-popover\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Popover = PopoverPrimitive.Root\nconst PopoverTrigger = PopoverPrimitive.Trigger\nconst PopoverAnchor = PopoverPrimitive.Anchor\n\nconst PopoverContent = React.forwardRef<\n  React.ElementRef<typeof PopoverPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>\n>(({ className, align = \"center\", sideOffset = 4, ...props }, ref) => (\n  <PopoverPrimitive.Portal>\n    <PopoverPrimitive.Content\n      ref={ref}\n      align={align}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n        className\n      )}\n      {...props}\n    />\n  </PopoverPrimitive.Portal>\n))\nPopoverContent.displayName = PopoverPrimitive.Content.displayName\n\nexport { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }\n",
+          "type": "registry:ui",
+          "target": "components/ui/popover.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "Use to show a placeholder while content is loading.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/skeleton.tsx",
+          "content": "import { cn } from \"@/lib/utils\"\n\nfunction Skeleton({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLDivElement>) {\n  return (\n    <div\n      className={cn(\"animate-pulse rounded-md bg-primary/10\", className)}\n      {...props}\n    />\n  )\n}\n\nexport { Skeleton }\n",
+          "type": "registry:ui",
+          "target": "components/ui/skeleton.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "Extends the Dialog component to display content that complements the main screen.",
+      "dependencies": [
+        "@radix-ui/react-dialog",
+        "class-variance-authority",
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/sheet.tsx",
+          "content": "import * as React from \"react\"\nimport * as SheetPrimitive from \"@radix-ui/react-dialog\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\nimport { X } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Sheet = SheetPrimitive.Root\nconst SheetTrigger = SheetPrimitive.Trigger\nconst SheetClose = SheetPrimitive.Close\nconst SheetPortal = SheetPrimitive.Portal\n\nconst SheetOverlay = React.forwardRef<\n  React.ElementRef<typeof SheetPrimitive.Overlay>,\n  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>\n>(({ className, ...props }, ref) => (\n  <SheetPrimitive.Overlay\n    className={cn(\n      \"fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0\",\n      className\n    )}\n    {...props}\n    ref={ref}\n  />\n))\nSheetOverlay.displayName = SheetPrimitive.Overlay.displayName\n\nconst sheetVariants = cva(\n  \"fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out\",\n  {\n    variants: {\n      side: {\n        top: \"inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top\",\n        bottom:\n          \"inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom\",\n        left: \"inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm\",\n        right:\n          \"inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm\",\n      },\n    },\n    defaultVariants: {\n      side: \"right\",\n    },\n  }\n)\n\ninterface SheetContentProps\n  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,\n    VariantProps<typeof sheetVariants> {}\n\nconst SheetContent = React.forwardRef<\n  React.ElementRef<typeof SheetPrimitive.Content>,\n  SheetContentProps\n>(({ side = \"right\", className, children, ...props }, ref) => (\n  <SheetPortal>\n    <SheetOverlay />\n    <SheetPrimitive.Content\n      ref={ref}\n      className={cn(sheetVariants({ side }), className)}\n      {...props}\n    >\n      <SheetPrimitive.Close className=\"absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary\">\n        <X className=\"h-4 w-4\" />\n        <span className=\"sr-only\">Close</span>\n      </SheetPrimitive.Close>\n      {children}\n    </SheetPrimitive.Content>\n  </SheetPortal>\n))\nSheetContent.displayName = SheetPrimitive.Content.displayName\n\nconst SheetHeader = ({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLDivElement>) => (\n  <div\n    className={cn(\n      \"flex flex-col space-y-2 text-center sm:text-left\",\n      className\n    )}\n    {...props}\n  />\n)\nSheetHeader.displayName = \"SheetHeader\"\n\nconst SheetFooter = ({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLDivElement>) => (\n  <div\n    className={cn(\n      \"flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2\",\n      className\n    )}\n    {...props}\n  />\n)\nSheetFooter.displayName = \"SheetFooter\"\n\nconst SheetTitle = React.forwardRef<\n  React.ElementRef<typeof SheetPrimitive.Title>,\n  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>\n>(({ className, ...props }, ref) => (\n  <SheetPrimitive.Title\n    ref={ref}\n    className={cn(\"text-lg font-semibold text-foreground\", className)}\n    {...props}\n  />\n))\nSheetTitle.displayName = SheetPrimitive.Title.displayName\n\nconst SheetDescription = React.forwardRef<\n  React.ElementRef<typeof SheetPrimitive.Description>,\n  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>\n>(({ className, ...props }, ref) => (\n  <SheetPrimitive.Description\n    ref={ref}\n    className={cn(\"text-sm text-muted-foreground\", className)}\n    {...props}\n  />\n))\nSheetDescription.displayName = SheetPrimitive.Description.displayName\n\nexport {\n  Sheet,\n  SheetPortal,\n  SheetOverlay,\n  SheetTrigger,\n  SheetClose,\n  SheetContent,\n  SheetHeader,\n  SheetFooter,\n  SheetTitle,\n  SheetDescription,\n}\n",
+          "type": "registry:ui",
+          "target": "components/ui/sheet.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Displays a callout for user attention.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/alert.tsx",
+          "content": "import * as React from \"react\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst alertVariants = cva(\n  \"relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7\",\n  {\n    variants: {\n      variant: {\n        default: \"bg-background text-foreground\",\n        destructive:\n          \"border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive\",\n        warning:\n          \"border-amber-500/50 text-amber-900 dark:text-amber-300 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400 bg-amber-500/10\",\n        success:\n          \"border-emerald-500/50 text-emerald-900 dark:text-emerald-300 [&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-400 bg-emerald-500/10\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n    },\n  }\n)\n\nconst Alert = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>\n>(({ className, variant, ...props }, ref) => (\n  <div\n    ref={ref}\n    role=\"alert\"\n    className={cn(alertVariants({ variant }), className)}\n    {...props}\n  />\n))\nAlert.displayName = \"Alert\"\n\nconst AlertTitle = React.forwardRef<\n  HTMLParagraphElement,\n  React.HTMLAttributes<HTMLHeadingElement>\n>(({ className, ...props }, ref) => (\n  <h5\n    ref={ref}\n    className={cn(\"mb-1 font-medium leading-none tracking-tight\", className)}\n    {...props}\n  />\n))\nAlertTitle.displayName = \"AlertTitle\"\n\nconst AlertDescription = React.forwardRef<\n  HTMLParagraphElement,\n  React.HTMLAttributes<HTMLParagraphElement>\n>(({ className, ...props }, ref) => (\n  <div\n    ref={ref}\n    className={cn(\"text-sm [&_p]:leading-relaxed\", className)}\n    {...props}\n  />\n))\nAlertDescription.displayName = \"AlertDescription\"\n\nexport { Alert, AlertTitle, AlertDescription }\n",
+          "type": "registry:ui",
+          "target": "components/ui/alert.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll Area",
+      "description": "Augments native scroll functionality for custom cross-browser styling.",
+      "dependencies": [
+        "@radix-ui/react-scroll-area"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/scroll-area.tsx",
+          "content": "import * as React from \"react\"\nimport * as ScrollAreaPrimitive from \"@radix-ui/react-scroll-area\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst ScrollArea = React.forwardRef<\n  React.ElementRef<typeof ScrollAreaPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>\n>(({ className, children, ...props }, ref) => (\n  <ScrollAreaPrimitive.Root\n    ref={ref}\n    className={cn(\"relative overflow-hidden\", className)}\n    {...props}\n  >\n    <ScrollAreaPrimitive.Viewport className=\"h-full w-full rounded-[inherit]\">\n      {children}\n    </ScrollAreaPrimitive.Viewport>\n    <ScrollBar />\n    <ScrollAreaPrimitive.Corner />\n  </ScrollAreaPrimitive.Root>\n))\nScrollArea.displayName = ScrollAreaPrimitive.Root.displayName\n\nconst ScrollBar = React.forwardRef<\n  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,\n  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>\n>(({ className, orientation = \"vertical\", ...props }, ref) => (\n  <ScrollAreaPrimitive.ScrollAreaScrollbar\n    ref={ref}\n    orientation={orientation}\n    className={cn(\n      \"flex touch-none select-none transition-colors\",\n      orientation === \"vertical\" &&\n        \"h-full w-2.5 border-l border-l-transparent p-[1px]\",\n      orientation === \"horizontal\" &&\n        \"h-2.5 flex-col border-t border-t-transparent p-[1px]\",\n      className\n    )}\n    {...props}\n  >\n    <ScrollAreaPrimitive.ScrollAreaThumb className=\"relative flex-1 rounded-full bg-border\" />\n  </ScrollAreaPrimitive.ScrollAreaScrollbar>\n))\nScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName\n\nexport { ScrollArea, ScrollBar }\n",
+          "type": "registry:ui",
+          "target": "components/ui/scroll-area.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "Displays the path to the current resource using a hierarchy of links.",
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/breadcrumb.tsx",
+          "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { ChevronRight, MoreHorizontal } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Breadcrumb = React.forwardRef<\n  HTMLElement,\n  React.ComponentPropsWithoutRef<\"nav\"> & {\n    separator?: React.ReactNode\n  }\n>(({ ...props }, ref) => <nav ref={ref} aria-label=\"breadcrumb\" {...props} />)\nBreadcrumb.displayName = \"Breadcrumb\"\n\nconst BreadcrumbList = React.forwardRef<\n  HTMLOListElement,\n  React.ComponentPropsWithoutRef<\"ol\">\n>(({ className, ...props }, ref) => (\n  <ol\n    ref={ref}\n    className={cn(\n      \"flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5\",\n      className\n    )}\n    {...props}\n  />\n))\nBreadcrumbList.displayName = \"BreadcrumbList\"\n\nconst BreadcrumbItem = React.forwardRef<\n  HTMLLIElement,\n  React.ComponentPropsWithoutRef<\"li\">\n>(({ className, ...props }, ref) => (\n  <li\n    ref={ref}\n    className={cn(\"inline-flex items-center gap-1.5\", className)}\n    {...props}\n  />\n))\nBreadcrumbItem.displayName = \"BreadcrumbItem\"\n\nconst BreadcrumbLink = React.forwardRef<\n  HTMLAnchorElement,\n  React.ComponentPropsWithoutRef<\"a\"> & {\n    asChild?: boolean\n  }\n>(({ asChild, className, ...props }, ref) => {\n  const Comp = asChild ? Slot : \"a\"\n\n  return (\n    <Comp\n      ref={ref}\n      className={cn(\"transition-colors hover:text-foreground\", className)}\n      {...props}\n    />\n  )\n})\nBreadcrumbLink.displayName = \"BreadcrumbLink\"\n\nconst BreadcrumbPage = React.forwardRef<\n  HTMLSpanElement,\n  React.ComponentPropsWithoutRef<\"span\">\n>(({ className, ...props }, ref) => (\n  <span\n    ref={ref}\n    role=\"link\"\n    aria-disabled=\"true\"\n    aria-current=\"page\"\n    className={cn(\"font-normal text-foreground\", className)}\n    {...props}\n  />\n))\nBreadcrumbPage.displayName = \"BreadcrumbPage\"\n\nconst BreadcrumbSeparator = ({\n  children,\n  className,\n  ...props\n}: React.ComponentProps<\"li\">) => (\n  <li\n    role=\"presentation\"\n    aria-hidden=\"true\"\n    className={cn(\"[&>svg]:size-3.5\", className)}\n    {...props}\n  >\n    {children ?? <ChevronRight />}\n  </li>\n)\nBreadcrumbSeparator.displayName = \"BreadcrumbSeparator\"\n\nconst BreadcrumbEllipsis = ({\n  className,\n  ...props\n}: React.ComponentProps<\"span\">) => (\n  <span\n    role=\"presentation\"\n    aria-hidden=\"true\"\n    className={cn(\"flex h-9 w-9 items-center justify-center\", className)}\n    {...props}\n  >\n    <MoreHorizontal className=\"h-4 w-4\" />\n    <span className=\"sr-only\">More</span>\n  </span>\n)\nBreadcrumbEllipsis.displayName = \"BreadcrumbEllipsis\"\n\nexport {\n  Breadcrumb,\n  BreadcrumbList,\n  BreadcrumbItem,\n  BreadcrumbLink,\n  BreadcrumbPage,\n  BreadcrumbSeparator,\n  BreadcrumbEllipsis,\n}\n",
+          "type": "registry:ui",
+          "target": "components/ui/breadcrumb.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "app-shell",
+      "type": "registry:block",
+      "title": "App Shell Layout",
+      "description": "Full application dashboard shell layout with collapsible sidebar, navigation groups, active states, top header, breadcrumbs, search trigger, notifications, and mobile sheet drawer.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "input",
+        "dropdown-menu",
+        "sheet",
+        "avatar",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/app-shell.tsx",
+          "content": "import * as React from \"react\"\nimport {\n  LayoutDashboard,\n  BarChart3,\n  Users,\n  Settings,\n  Bell,\n  Search,\n  Menu,\n  ChevronDown,\n  LogOut,\n  Moon,\n  Sun,\n  PanelLeftClose,\n  PanelLeft,\n} from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\nimport { Input } from \"@/components/ui/input\"\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuTrigger,\n} from \"@/components/ui/dropdown-menu\"\nimport {\n  Sheet,\n  SheetContent,\n  SheetHeader,\n  SheetTitle,\n  SheetTrigger,\n} from \"@/components/ui/sheet\"\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport interface NavItem {\n  title: string\n  href: string\n  icon: React.ComponentType<{ className?: string }>\n  badge?: string | number\n  active?: boolean\n}\n\nexport interface NavSection {\n  title?: string\n  items: NavItem[]\n}\n\nexport interface AppShellProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n    href?: string\n  }\n  navigation?: NavSection[]\n  user?: {\n    name: string\n    email: string\n    avatar?: string\n    initials?: string\n  }\n  children: React.ReactNode\n  breadcrumbs?: React.ReactNode\n  actions?: React.ReactNode\n  onSearchClick?: () => void\n  onThemeToggle?: () => void\n}\n\nconst DEFAULT_NAVIGATION: NavSection[] = [\n  {\n    title: \"Overview\",\n    items: [\n      { title: \"Dashboard\", href: \"#\", icon: LayoutDashboard, active: true },\n      { title: \"Analytics\", href: \"#\", icon: BarChart3, badge: \"New\" },\n      { title: \"Customers\", href: \"#\", icon: Users },\n    ],\n  },\n  {\n    title: \"Configuration\",\n    items: [\n      { title: \"Settings\", href: \"#\", icon: Settings },\n    ],\n  },\n]\n\nexport function AppShell({\n  brand = { name: \"Lumen App\" },\n  navigation = DEFAULT_NAVIGATION,\n  user = { name: \"Alex Rivera\", email: \"alex@example.com\", initials: \"AR\" },\n  children,\n  breadcrumbs,\n  actions,\n  onSearchClick,\n  onThemeToggle,\n}: AppShellProps) {\n  const [collapsed, setCollapsed] = React.useState(false)\n  const [mobileOpen, setMobileOpen] = React.useState(false)\n\n  const renderSidebarContent = (isMobile = false) => (\n    <div className=\"flex h-full flex-col justify-between\">\n      <div className=\"flex flex-col gap-4\">\n        {/* Brand header */}\n        <div className=\"flex h-14 items-center justify-between border-b px-4\">\n          <a\n            href={brand.href ?? \"/\"}\n            className=\"flex items-center gap-2 font-semibold tracking-tight text-foreground\"\n          >\n            {brand.logo ?? (\n              <div className=\"flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold\">\n                L\n              </div>\n            )}\n            {(!collapsed || isMobile) && (\n              <span className=\"truncate text-base\">{brand.name}</span>\n            )}\n          </a>\n          {!isMobile && (\n            <Button\n              variant=\"ghost\"\n              size=\"icon\"\n              className=\"h-8 w-8\"\n              onClick={() => setCollapsed(!collapsed)}\n              title={collapsed ? \"Expand sidebar\" : \"Collapse sidebar\"}\n            >\n              {collapsed ? (\n                <PanelLeft className=\"h-4 w-4\" />\n              ) : (\n                <PanelLeftClose className=\"h-4 w-4\" />\n              )}\n            </Button>\n          )}\n        </div>\n\n        {/* Navigation list */}\n        <nav className=\"flex flex-col gap-6 px-2\">\n          {navigation.map((section, idx) => (\n            <div key={idx} className=\"flex flex-col gap-1\">\n              {section.title && (!collapsed || isMobile) && (\n                <span className=\"px-2 text-xs font-medium text-muted-foreground uppercase tracking-wider\">\n                  {section.title}\n                </span>\n              )}\n              {section.items.map((item, itemIdx) => {\n                const Icon = item.icon\n                return (\n                  <a\n                    key={itemIdx}\n                    href={item.href}\n                    className={cn(\n                      \"group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors\",\n                      item.active\n                        ? \"bg-primary text-primary-foreground\"\n                        : \"text-muted-foreground hover:bg-muted hover:text-foreground\"\n                    )}\n                    title={collapsed && !isMobile ? item.title : undefined}\n                  >\n                    <Icon className=\"h-4 w-4 shrink-0\" />\n                    {(!collapsed || isMobile) && (\n                      <span className=\"truncate flex-1\">{item.title}</span>\n                    )}\n                    {(!collapsed || isMobile) && item.badge && (\n                      <Badge\n                        variant={item.active ? \"secondary\" : \"outline\"}\n                        className=\"ml-auto text-xs px-1.5 py-0\"\n                      >\n                        {item.badge}\n                      </Badge>\n                    )}\n                  </a>\n                )\n              })}\n            </div>\n          ))}\n        </nav>\n      </div>\n\n      {/* Sidebar bottom user summary */}\n      <div className=\"border-t p-3\">\n        <DropdownMenu>\n          <DropdownMenuTrigger asChild>\n            <Button\n              variant=\"ghost\"\n              className={cn(\n                \"w-full justify-start gap-2 px-2 hover:bg-muted\",\n                collapsed && !isMobile && \"justify-center px-0\"\n              )}\n            >\n              <Avatar className=\"h-7 w-7\">\n                {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}\n                <AvatarFallback>{user.initials ?? user.name.slice(0, 2).toUpperCase()}</AvatarFallback>\n              </Avatar>\n              {(!collapsed || isMobile) && (\n                <div className=\"flex flex-col items-start truncate text-left text-xs leading-tight\">\n                  <span className=\"font-medium text-foreground\">{user.name}</span>\n                  <span className=\"text-muted-foreground truncate\">{user.email}</span>\n                </div>\n              )}\n            </Button>\n          </DropdownMenuTrigger>\n          <DropdownMenuContent align=\"end\" className=\"w-56\">\n            <DropdownMenuLabel className=\"font-normal\">\n              <div className=\"flex flex-col space-y-1\">\n                <p className=\"text-sm font-medium leading-none\">{user.name}</p>\n                <p className=\"text-xs leading-none text-muted-foreground\">{user.email}</p>\n              </div>\n            </DropdownMenuLabel>\n            <DropdownMenuSeparator />\n            <DropdownMenuItem>\n              <Settings className=\"mr-2 h-4 w-4\" />\n              <span>Settings</span>\n            </DropdownMenuItem>\n            {onThemeToggle && (\n              <DropdownMenuItem onClick={onThemeToggle}>\n                <Moon className=\"mr-2 h-4 w-4\" />\n                <span>Toggle theme</span>\n              </DropdownMenuItem>\n            )}\n            <DropdownMenuSeparator />\n            <DropdownMenuItem className=\"text-destructive\">\n              <LogOut className=\"mr-2 h-4 w-4\" />\n              <span>Log out</span>\n            </DropdownMenuItem>\n          </DropdownMenuContent>\n        </DropdownMenu>\n      </div>\n    </div>\n  )\n\n  return (\n    <div className=\"flex min-h-screen bg-background text-foreground\">\n      {/* Desktop sidebar */}\n      <aside\n        className={cn(\n          \"hidden md:flex flex-col border-r bg-card transition-all duration-300\",\n          collapsed ? \"w-16\" : \"w-64\"\n        )}\n      >\n        {renderSidebarContent(false)}\n      </aside>\n\n      {/* Mobile drawer */}\n      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>\n        <SheetContent side=\"left\" className=\"p-0 w-72\">\n          <SheetHeader className=\"sr-only\">\n            <SheetTitle>Navigation Menu</SheetTitle>\n          </SheetHeader>\n          {renderSidebarContent(true)}\n        </SheetContent>\n      </Sheet>\n\n      {/* Main shell area */}\n      <div className=\"flex flex-1 flex-col overflow-hidden\">\n        {/* Top header navbar */}\n        <header className=\"sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60\">\n          <Button\n            variant=\"ghost\"\n            size=\"icon\"\n            className=\"md:hidden\"\n            onClick={() => setMobileOpen(true)}\n          >\n            <Menu className=\"h-5 w-5\" />\n            <span className=\"sr-only\">Toggle navigation</span>\n          </Button>\n\n          <div className=\"flex-1\">\n            {breadcrumbs}\n          </div>\n\n          <div className=\"flex items-center gap-2\">\n            {onSearchClick ? (\n              <Button\n                variant=\"outline\"\n                size=\"sm\"\n                className=\"hidden sm:flex text-muted-foreground gap-2 w-48 justify-start text-xs\"\n                onClick={onSearchClick}\n              >\n                <Search className=\"h-3.5 w-3.5\" />\n                <span>Search anything...</span>\n                <kbd className=\"pointer-events-none ml-auto inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100\">\n                  ⌘K\n                </kbd>\n              </Button>\n            ) : null}\n\n            <Button variant=\"ghost\" size=\"icon\" className=\"relative h-8 w-8\">\n              <Bell className=\"h-4 w-4\" />\n              <span className=\"absolute top-1 right-1 h-2 w-2 rounded-full bg-primary\" />\n              <span className=\"sr-only\">Notifications</span>\n            </Button>\n\n            {actions}\n          </div>\n        </header>\n\n        {/* Content body */}\n        <main className=\"flex-1 overflow-y-auto p-4 md:p-6 lg:p-8\">\n          {children}\n        </main>\n      </div>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/app-shell.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "marketing-layout",
+      "type": "registry:block",
+      "title": "Marketing Layout",
+      "description": "Universal marketing layout with sticky blurred header, brand logo, desktop and mobile responsive nav, announcement banner, and comprehensive multi-column footer.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/marketing-layout.tsx",
+          "content": "import * as React from \"react\"\nimport { Menu, X, ArrowRight, Github, Twitter, Linkedin, CheckCircle2 } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\nimport { Input } from \"@/components/ui/input\"\n\nexport interface MarketingLink {\n  title: string\n  href: string\n}\n\nexport interface MarketingFooterGroup {\n  title: string\n  links: MarketingLink[]\n}\n\nexport interface MarketingLayoutProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n    href?: string\n  }\n  navigation?: MarketingLink[]\n  banner?: {\n    text: string\n    ctaText?: string\n    ctaHref?: string\n  }\n  footerGroups?: MarketingFooterGroup[]\n  children: React.ReactNode\n  onNewsletterSubmit?: (email: string) => void\n}\n\nconst DEFAULT_LINKS: MarketingLink[] = [\n  { title: \"Features\", href: \"#features\" },\n  { title: \"Solutions\", href: \"#solutions\" },\n  { title: \"Pricing\", href: \"#pricing\" },\n  { title: \"Docs\", href: \"#docs\" },\n]\n\nconst DEFAULT_FOOTER_GROUPS: MarketingFooterGroup[] = [\n  {\n    title: \"Product\",\n    links: [\n      { title: \"Features\", href: \"#\" },\n      { title: \"Integrations\", href: \"#\" },\n      { title: \"Changelog\", href: \"#\" },\n      { title: \"Roadmap\", href: \"#\" },\n    ],\n  },\n  {\n    title: \"Resources\",\n    links: [\n      { title: \"Documentation\", href: \"#\" },\n      { title: \"API Reference\", href: \"#\" },\n      { title: \"Guides\", href: \"#\" },\n      { title: \"Community\", href: \"#\" },\n    ],\n  },\n  {\n    title: \"Company\",\n    links: [\n      { title: \"About\", href: \"#\" },\n      { title: \"Blog\", href: \"#\" },\n      { title: \"Careers\", href: \"#\" },\n      { title: \"Contact\", href: \"#\" },\n    ],\n  },\n  {\n    title: \"Legal\",\n    links: [\n      { title: \"Privacy\", href: \"#\" },\n      { title: \"Terms\", href: \"#\" },\n      { title: \"Security\", href: \"#\" },\n    ],\n  },\n]\n\nexport function MarketingLayout({\n  brand = { name: \"Lumen\" },\n  navigation = DEFAULT_LINKS,\n  banner,\n  footerGroups = DEFAULT_FOOTER_GROUPS,\n  children,\n  onNewsletterSubmit,\n}: MarketingLayoutProps) {\n  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)\n  const [email, setEmail] = React.useState(\"\")\n  const [subscribed, setSubscribed] = React.useState(false)\n\n  const handleSubscribe = (e: React.FormEvent) => {\n    e.preventDefault()\n    if (!email) return\n    onNewsletterSubmit?.(email)\n    setSubscribed(true)\n  }\n\n  return (\n    <div className=\"flex min-h-screen flex-col bg-background text-foreground\">\n      {/* Top announcement banner */}\n      {banner && (\n        <div className=\"flex items-center justify-center gap-2 bg-primary px-4 py-2 text-xs font-medium text-primary-foreground\">\n          <span>{banner.text}</span>\n          {banner.ctaText && (\n            <a\n              href={banner.ctaHref ?? \"#\"}\n              className=\"inline-flex items-center gap-1 font-semibold underline underline-offset-4 hover:opacity-90\"\n            >\n              {banner.ctaText}\n              <ArrowRight className=\"h-3 w-3\" />\n            </a>\n          )}\n        </div>\n      )}\n\n      {/* Sticky header navbar */}\n      <header className=\"sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md\">\n        <div className=\"mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8\">\n          <div className=\"flex items-center gap-8\">\n            <a href={brand.href ?? \"/\"} className=\"flex items-center gap-2 font-bold tracking-tight text-lg\">\n              {brand.logo ?? (\n                <div className=\"flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-extrabold text-base\">\n                  L\n                </div>\n              )}\n              <span>{brand.name}</span>\n            </a>\n\n            <nav className=\"hidden md:flex items-center gap-6 text-sm font-medium\">\n              {navigation.map((item, idx) => (\n                <a\n                  key={idx}\n                  href={item.href}\n                  className=\"text-muted-foreground transition-colors hover:text-foreground\"\n                >\n                  {item.title}\n                </a>\n              ))}\n            </nav>\n          </div>\n\n          <div className=\"hidden md:flex items-center gap-3\">\n            <Button variant=\"ghost\" size=\"sm\" asChild>\n              <a href=\"#login\">Log in</a>\n            </Button>\n            <Button size=\"sm\" asChild>\n              <a href=\"#get-started\">Get Started</a>\n            </Button>\n          </div>\n\n          <button\n            type=\"button\"\n            className=\"md:hidden p-2 text-foreground\"\n            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}\n            aria-label=\"Toggle mobile menu\"\n          >\n            {mobileMenuOpen ? <X className=\"h-6 w-6\" /> : <Menu className=\"h-6 w-6\" />}\n          </button>\n        </div>\n\n        {/* Mobile menu dropdown */}\n        {mobileMenuOpen && (\n          <div className=\"border-b bg-background px-4 py-6 md:hidden\">\n            <nav className=\"flex flex-col gap-4 text-base font-medium\">\n              {navigation.map((item, idx) => (\n                <a\n                  key={idx}\n                  href={item.href}\n                  className=\"text-muted-foreground transition-colors hover:text-foreground\"\n                  onClick={() => setMobileMenuOpen(false)}\n                >\n                  {item.title}\n                </a>\n              ))}\n              <div className=\"pt-4 border-t flex flex-col gap-2\">\n                <Button variant=\"outline\" className=\"w-full\" asChild>\n                  <a href=\"#login\">Log in</a>\n                </Button>\n                <Button className=\"w-full\" asChild>\n                  <a href=\"#get-started\">Get Started</a>\n                </Button>\n              </div>\n            </nav>\n          </div>\n        )}\n      </header>\n\n      {/* Main content body */}\n      <main className=\"flex-1\">{children}</main>\n\n      {/* Global marketing footer */}\n      <footer className=\"border-t bg-muted/30\">\n        <div className=\"mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16\">\n          <div className=\"grid grid-cols-2 gap-8 md:grid-cols-6 lg:gap-12\">\n            <div className=\"col-span-2 flex flex-col gap-4\">\n              <a href={brand.href ?? \"/\"} className=\"flex items-center gap-2 font-bold tracking-tight text-lg\">\n                {brand.logo ?? (\n                  <div className=\"flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-extrabold text-sm\">\n                    L\n                  </div>\n                )}\n                <span>{brand.name}</span>\n              </a>\n              <p className=\"text-sm text-muted-foreground max-w-sm\">\n                Next-generation building blocks and architecture for modern web applications.\n              </p>\n              <div className=\"flex items-center gap-3 text-muted-foreground\">\n                <a href=\"https://github.com\" className=\"hover:text-foreground\">\n                  <Github className=\"h-4 w-4\" />\n                </a>\n                <a href=\"https://twitter.com\" className=\"hover:text-foreground\">\n                  <Twitter className=\"h-4 w-4\" />\n                </a>\n                <a href=\"https://linkedin.com\" className=\"hover:text-foreground\">\n                  <Linkedin className=\"h-4 w-4\" />\n                </a>\n              </div>\n            </div>\n\n            {footerGroups.map((group, idx) => (\n              <div key={idx} className=\"flex flex-col gap-3\">\n                <h4 className=\"text-xs font-semibold uppercase tracking-wider text-foreground\">\n                  {group.title}\n                </h4>\n                <ul className=\"flex flex-col gap-2 text-sm text-muted-foreground\">\n                  {group.links.map((link, linkIdx) => (\n                    <li key={linkIdx}>\n                      <a href={link.href} className=\"transition-colors hover:text-foreground\">\n                        {link.title}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n\n          <div className=\"mt-12 border-t pt-8 flex flex-col sm:flex-row items-center justify-between gap-4\">\n            <p className=\"text-xs text-muted-foreground\">\n              &copy; {new Date().getFullYear()} {brand.name}. All rights reserved.\n            </p>\n            <div className=\"flex items-center gap-2 text-xs text-muted-foreground\">\n              <span className=\"flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse\" />\n              <span>All systems operational</span>\n            </div>\n          </div>\n        </div>\n      </footer>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/marketing-layout.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "stacked-layout",
+      "type": "registry:block",
+      "title": "Stacked Top-Nav Layout",
+      "description": "Enterprise console layout with top org/workspace switcher, primary tabs, search shortcut, notifications, subheader secondary tabs and actions.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "dropdown-menu",
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/stacked-layout.tsx",
+          "content": "import * as React from \"react\"\nimport {\n  Bell,\n  Search,\n  ChevronDown,\n  ChevronsUpDown,\n  Check,\n  Settings,\n  LogOut,\n  Plus,\n} from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuTrigger,\n} from \"@/components/ui/dropdown-menu\"\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\n\nexport interface StackedTab {\n  title: string\n  href: string\n  active?: boolean\n  badge?: string | number\n}\n\nexport interface OrgScope {\n  id: string\n  name: string\n  plan?: string\n}\n\nexport interface StackedLayoutProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n    href?: string\n  }\n  organizations?: OrgScope[]\n  activeOrgId?: string\n  onOrgSelect?: (orgId: string) => void\n  primaryTabs?: StackedTab[]\n  secondaryTabs?: StackedTab[]\n  user?: {\n    name: string\n    email: string\n    avatar?: string\n    initials?: string\n  }\n  breadcrumbs?: React.ReactNode\n  actions?: React.ReactNode\n  onSearchClick?: () => void\n  children: React.ReactNode\n}\n\nconst DEFAULT_PRIMARY_TABS: StackedTab[] = [\n  { title: \"Overview\", href: \"#\", active: true },\n  { title: \"Deployments\", href: \"#\" },\n  { title: \"Analytics\", href: \"#\" },\n  { title: \"Activity\", href: \"#\" },\n  { title: \"Settings\", href: \"#\" },\n]\n\nexport function StackedLayout({\n  brand = { name: \"Lumen\" },\n  organizations = [\n    { id: \"org-1\", name: \"Acme Corp\", plan: \"Pro\" },\n    { id: \"org-2\", name: \"Personal\", plan: \"Hobby\" },\n  ],\n  activeOrgId = \"org-1\",\n  onOrgSelect,\n  primaryTabs = DEFAULT_PRIMARY_TABS,\n  secondaryTabs,\n  user = { name: \"Alex Rivera\", email: \"alex@example.com\", initials: \"AR\" },\n  breadcrumbs,\n  actions,\n  onSearchClick,\n  children,\n}: StackedLayoutProps) {\n  const currentOrg = organizations.find((o) => o.id === activeOrgId) ?? organizations[0]\n\n  return (\n    <div className=\"min-h-screen bg-background text-foreground flex flex-col\">\n      {/* Top primary bar */}\n      <header className=\"border-b bg-background\">\n        <div className=\"mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8\">\n          <div className=\"flex items-center gap-4\">\n            <a href={brand.href ?? \"/\"} className=\"flex items-center gap-2 font-bold tracking-tight\">\n              {brand.logo ?? (\n                <div className=\"flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm\">\n                  L\n                </div>\n              )}\n            </a>\n\n            <span className=\"text-muted-foreground/40 text-lg\">/</span>\n\n            {/* Org Switcher */}\n            <DropdownMenu>\n              <DropdownMenuTrigger asChild>\n                <Button variant=\"ghost\" size=\"sm\" className=\"h-8 gap-2 px-2 text-sm font-semibold\">\n                  <span>{currentOrg?.name}</span>\n                  <ChevronsUpDown className=\"h-3.5 w-3.5 opacity-50\" />\n                </Button>\n              </DropdownMenuTrigger>\n              <DropdownMenuContent align=\"start\" className=\"w-52\">\n                <DropdownMenuLabel className=\"text-xs text-muted-foreground\">Teams & Organizations</DropdownMenuLabel>\n                {organizations.map((org) => (\n                  <DropdownMenuItem\n                    key={org.id}\n                    onClick={() => onOrgSelect?.(org.id)}\n                    className=\"flex items-center justify-between\"\n                  >\n                    <span className=\"truncate\">{org.name}</span>\n                    {org.id === activeOrgId && <Check className=\"h-4 w-4\" />}\n                  </DropdownMenuItem>\n                ))}\n                <DropdownMenuSeparator />\n                <DropdownMenuItem className=\"gap-2 text-xs\">\n                  <Plus className=\"h-3.5 w-3.5\" />\n                  <span>Create Team</span>\n                </DropdownMenuItem>\n              </DropdownMenuContent>\n            </DropdownMenu>\n          </div>\n\n          <div className=\"flex items-center gap-3\">\n            {onSearchClick && (\n              <Button\n                variant=\"outline\"\n                size=\"sm\"\n                className=\"hidden sm:flex text-muted-foreground gap-2 w-48 justify-start text-xs h-8\"\n                onClick={onSearchClick}\n              >\n                <Search className=\"h-3.5 w-3.5\" />\n                <span>Quick search...</span>\n                <kbd className=\"pointer-events-none ml-auto inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100\">\n                  ⌘K\n                </kbd>\n              </Button>\n            )}\n\n            <Button variant=\"ghost\" size=\"icon\" className=\"h-8 w-8 text-muted-foreground\">\n              <Bell className=\"h-4 w-4\" />\n              <span className=\"sr-only\">Notifications</span>\n            </Button>\n\n            <DropdownMenu>\n              <DropdownMenuTrigger asChild>\n                <Button variant=\"ghost\" className=\"relative h-8 w-8 rounded-full p-0\">\n                  <Avatar className=\"h-8 w-8\">\n                    {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}\n                    <AvatarFallback>{user.initials ?? user.name.slice(0, 2).toUpperCase()}</AvatarFallback>\n                  </Avatar>\n                </Button>\n              </DropdownMenuTrigger>\n              <DropdownMenuContent align=\"end\" className=\"w-56\">\n                <DropdownMenuLabel className=\"font-normal\">\n                  <div className=\"flex flex-col space-y-1\">\n                    <p className=\"text-sm font-medium leading-none\">{user.name}</p>\n                    <p className=\"text-xs leading-none text-muted-foreground\">{user.email}</p>\n                  </div>\n                </DropdownMenuLabel>\n                <DropdownMenuSeparator />\n                <DropdownMenuItem>\n                  <Settings className=\"mr-2 h-4 w-4\" />\n                  <span>Account Settings</span>\n                </DropdownMenuItem>\n                <DropdownMenuSeparator />\n                <DropdownMenuItem className=\"text-destructive\">\n                  <LogOut className=\"mr-2 h-4 w-4\" />\n                  <span>Log out</span>\n                </DropdownMenuItem>\n              </DropdownMenuContent>\n            </DropdownMenu>\n          </div>\n        </div>\n\n        {/* Primary tabs row */}\n        {primaryTabs && primaryTabs.length > 0 && (\n          <div className=\"mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 sm:px-6 lg:px-8\">\n            {primaryTabs.map((tab, idx) => (\n              <a\n                key={idx}\n                href={tab.href}\n                className={cn(\n                  \"relative py-2.5 text-sm font-medium transition-colors hover:text-foreground whitespace-nowrap\",\n                  tab.active ? \"text-foreground\" : \"text-muted-foreground\"\n                )}\n              >\n                {tab.title}\n                {tab.active && (\n                  <span className=\"absolute inset-x-0 bottom-0 h-[2px] bg-primary\" />\n                )}\n              </a>\n            ))}\n          </div>\n        )}\n      </header>\n\n      {/* Subheader bar (breadcrumbs + secondary actions / tabs) */}\n      {(breadcrumbs || actions || secondaryTabs) && (\n        <div className=\"border-b bg-muted/20\">\n          <div className=\"mx-auto flex max-w-7xl flex-col gap-2 py-4 px-4 sm:px-6 lg:px-8 sm:flex-row sm:items-center sm:justify-between\">\n            <div>{breadcrumbs}</div>\n            {actions && <div className=\"flex items-center gap-2\">{actions}</div>}\n          </div>\n          {secondaryTabs && secondaryTabs.length > 0 && (\n            <div className=\"mx-auto flex max-w-7xl items-center gap-4 overflow-x-auto px-4 sm:px-6 lg:px-8 pb-2\">\n              {secondaryTabs.map((tab, idx) => (\n                <a\n                  key={idx}\n                  href={tab.href}\n                  className={cn(\n                    \"rounded-md px-2.5 py-1 text-xs font-medium transition-colors\",\n                    tab.active\n                      ? \"bg-secondary text-secondary-foreground\"\n                      : \"text-muted-foreground hover:bg-muted hover:text-foreground\"\n                  )}\n                >\n                  {tab.title}\n                </a>\n              ))}\n            </div>\n          )}\n        </div>\n      )}\n\n      {/* Page content */}\n      <main className=\"mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8\">\n        {children}\n      </main>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/stacked-layout.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "auth-split",
+      "type": "registry:block",
+      "title": "Auth Split Layout",
+      "description": "Split authentication screen with branded showcase/testimonial panel on left and form slot with terms on right.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/auth-split.tsx",
+          "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\n\nexport interface AuthSplitProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n    href?: string\n  }\n  testimonial?: {\n    quote: string\n    author: string\n    role?: string\n  }\n  topAction?: {\n    text: string\n    linkText: string\n    href: string\n  }\n  children: React.ReactNode\n}\n\nexport function AuthSplit({\n  brand = { name: \"Lumen\" },\n  testimonial = {\n    quote: \"This architecture transformed our delivery velocity. Building production-grade products has never been this seamless.\",\n    author: \"Sofia Chen\",\n    role: \"VP of Engineering at Acme\",\n  },\n  topAction = {\n    text: \"Don't have an account?\",\n    linkText: \"Sign up\",\n    href: \"#signup\",\n  },\n  children,\n}: AuthSplitProps) {\n  return (\n    <div className=\"relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0 bg-background text-foreground\">\n      {/* Brand & Testimonial Hero Column */}\n      <div className=\"relative hidden h-full flex-col justify-between bg-zinc-950 p-10 text-white lg:flex dark:border-r border-border\">\n        {/* Subtle decorative background gradient */}\n        <div className=\"absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))]\" />\n        \n        <div className=\"relative z-20 flex items-center gap-2 text-lg font-bold\">\n          {brand.logo ?? (\n            <div className=\"flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-950 font-black text-base\">\n              L\n            </div>\n          )}\n          <span>{brand.name}</span>\n        </div>\n\n        <div className=\"relative z-20 mt-auto\">\n          <blockquote className=\"space-y-2\">\n            <p className=\"text-lg leading-relaxed text-zinc-300\">\n              &ldquo;{testimonial.quote}&rdquo;\n            </p>\n            <footer className=\"text-sm\">\n              <span className=\"font-semibold text-white\">{testimonial.author}</span>\n              {testimonial.role && (\n                <span className=\"text-zinc-400\"> &mdash; {testimonial.role}</span>\n              )}\n            </footer>\n          </blockquote>\n        </div>\n      </div>\n\n      {/* Auth Form Column */}\n      <div className=\"flex min-h-screen flex-col justify-between p-6 sm:p-12 lg:p-16\">\n        {topAction && (\n          <div className=\"flex justify-end text-sm text-muted-foreground\">\n            <span>{topAction.text} </span>\n            <a\n              href={topAction.href}\n              className=\"ml-1 font-semibold text-foreground underline underline-offset-4 hover:opacity-80\"\n            >\n              {topAction.linkText}\n            </a>\n          </div>\n        )}\n\n        <div className=\"mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]\">\n          {children}\n        </div>\n\n        <p className=\"px-8 text-center text-xs text-muted-foreground\">\n          By clicking continue, you agree to our{\" \"}\n          <a href=\"#terms\" className=\"underline underline-offset-4 hover:text-foreground\">\n            Terms of Service\n          </a>{\" \"}\n          and{\" \"}\n          <a href=\"#privacy\" className=\"underline underline-offset-4 hover:text-foreground\">\n            Privacy Policy\n          </a>\n          .\n        </p>\n      </div>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/auth-split.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "auth-card",
+      "type": "registry:block",
+      "title": "Auth Card Layout",
+      "description": "Centered clean authentication card layout with brand logo, social login buttons, separator, and footer link.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "card",
+        "button"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/auth-card.tsx",
+          "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\nimport {\n  Card,\n  CardContent,\n  CardDescription,\n  CardFooter,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/card\"\nimport { Button } from \"@/components/ui/button\"\n\nexport interface AuthCardProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n  }\n  title?: string\n  description?: string\n  socialProviders?: {\n    name: string\n    icon: React.ComponentType<{ className?: string }>\n    onClick: () => void\n  }[]\n  footerAction?: {\n    text: string\n    linkText: string\n    href: string\n  }\n  children: React.ReactNode\n}\n\nexport function AuthCard({\n  brand = { name: \"Lumen\" },\n  title = \"Welcome back\",\n  description = \"Enter your credentials to access your account\",\n  socialProviders,\n  footerAction = {\n    text: \"Don't have an account?\",\n    linkText: \"Sign up\",\n    href: \"#signup\",\n  },\n  children,\n}: AuthCardProps) {\n  return (\n    <div className=\"flex min-h-screen items-center justify-center bg-muted/40 p-4 sm:p-8 text-foreground\">\n      <div className=\"w-full max-w-md\">\n        {/* Centered Brand Icon */}\n        <div className=\"mb-6 flex flex-col items-center gap-2 text-center\">\n          {brand.logo ?? (\n            <div className=\"flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-lg shadow-sm\">\n              L\n            </div>\n          )}\n          <span className=\"font-semibold text-sm tracking-tight text-muted-foreground\">\n            {brand.name}\n          </span>\n        </div>\n\n        <Card className=\"border-border/60 shadow-lg\">\n          <CardHeader className=\"space-y-1 text-center\">\n            <CardTitle className=\"text-xl font-bold tracking-tight\">{title}</CardTitle>\n            {description && <CardDescription>{description}</CardDescription>}\n          </CardHeader>\n\n          <CardContent className=\"space-y-4\">\n            {socialProviders && socialProviders.length > 0 && (\n              <>\n                <div className=\"grid grid-cols-1 gap-2\">\n                  {socialProviders.map((provider, idx) => {\n                    const Icon = provider.icon\n                    return (\n                      <Button\n                        key={idx}\n                        variant=\"outline\"\n                        className=\"w-full gap-2 text-xs font-medium\"\n                        onClick={provider.onClick}\n                      >\n                        <Icon className=\"h-4 w-4\" />\n                        <span>Continue with {provider.name}</span>\n                      </Button>\n                    )\n                  })}\n                </div>\n\n                <div className=\"relative\">\n                  <div className=\"absolute inset-0 flex items-center\">\n                    <span className=\"w-full border-t\" />\n                  </div>\n                  <div className=\"relative flex justify-center text-xs uppercase\">\n                    <span className=\"bg-card px-2 text-muted-foreground font-medium\">\n                      Or continue with\n                    </span>\n                  </div>\n                </div>\n              </>\n            )}\n\n            {children}\n          </CardContent>\n\n          {footerAction && (\n            <CardFooter className=\"flex justify-center border-t py-4 text-xs text-muted-foreground\">\n              <span>{footerAction.text} </span>\n              <a\n                href={footerAction.href}\n                className=\"ml-1 font-semibold text-foreground underline underline-offset-4 hover:opacity-80\"\n              >\n                {footerAction.linkText}\n              </a>\n            </CardFooter>\n          )}\n        </Card>\n      </div>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/auth-card.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "stats-grid",
+      "type": "registry:block",
+      "title": "Stats Grid",
+      "description": "Responsive KPI metrics overview grid with trend badges (increase/decrease/neutral), icons, and descriptions.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "card",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/stats-grid.tsx",
+          "content": "import * as React from \"react\"\nimport { TrendingUp, TrendingDown, Minus } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport interface StatItem {\n  id?: string\n  title: string\n  value: string | number\n  change?: {\n    value: string\n    type: \"increase\" | \"decrease\" | \"neutral\"\n  }\n  description?: string\n  icon?: React.ComponentType<{ className?: string }>\n}\n\nexport interface StatsGridProps {\n  stats: StatItem[]\n  columns?: 2 | 3 | 4\n  className?: string\n}\n\nexport function StatCard({ item }: { item: StatItem }) {\n  const Icon = item.icon\n\n  return (\n    <Card className=\"relative overflow-hidden\">\n      <CardHeader className=\"flex flex-row items-center justify-between space-y-0 pb-2\">\n        <CardTitle className=\"text-sm font-medium text-muted-foreground\">\n          {item.title}\n        </CardTitle>\n        {Icon && (\n          <div className=\"flex h-8 w-8 items-center justify-center rounded-md bg-muted text-muted-foreground\">\n            <Icon className=\"h-4 w-4\" />\n          </div>\n        )}\n      </CardHeader>\n      <CardContent>\n        <div className=\"text-2xl font-bold tracking-tight\">{item.value}</div>\n\n        {(item.change || item.description) && (\n          <div className=\"mt-2 flex items-center gap-2 text-xs\">\n            {item.change && (\n              <Badge\n                variant={\n                  item.change.type === \"increase\"\n                    ? \"success\"\n                    : item.change.type === \"decrease\"\n                    ? \"destructive\"\n                    : \"secondary\"\n                }\n                className=\"gap-1 px-1.5 py-0 font-medium\"\n              >\n                {item.change.type === \"increase\" && <TrendingUp className=\"h-3 w-3\" />}\n                {item.change.type === \"decrease\" && <TrendingDown className=\"h-3 w-3\" />}\n                {item.change.type === \"neutral\" && <Minus className=\"h-3 w-3\" />}\n                <span>{item.change.value}</span>\n              </Badge>\n            )}\n            {item.description && (\n              <span className=\"text-muted-foreground truncate\">{item.description}</span>\n            )}\n          </div>\n        )}\n      </CardContent>\n    </Card>\n  )\n}\n\nexport function StatsGrid({ stats, columns = 4, className }: StatsGridProps) {\n  const gridColsClass =\n    columns === 2\n      ? \"sm:grid-cols-2\"\n      : columns === 3\n      ? \"sm:grid-cols-2 lg:grid-cols-3\"\n      : \"sm:grid-cols-2 lg:grid-cols-4\"\n\n  return (\n    <div className={cn(\"grid grid-cols-1 gap-4\", gridColsClass, className)}>\n      {stats.map((stat, idx) => (\n        <StatCard key={stat.id ?? idx} item={stat} />\n      ))}\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/stats-grid.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "data-table-toolbar",
+      "type": "registry:block",
+      "title": "Data Table Toolbar",
+      "description": "Universal data table control bar with search input, faceted filter popovers with count badges, column visibility toggle dropdown, and action buttons.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "input",
+        "badge",
+        "popover",
+        "dropdown-menu",
+        "separator"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/data-table-toolbar.tsx",
+          "content": "import * as React from \"react\"\nimport { Search, X, SlidersHorizontal, Plus, Download, Check } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\nimport { Input } from \"@/components/ui/input\"\nimport { Badge } from \"@/components/ui/badge\"\nimport {\n  Popover,\n  PopoverContent,\n  PopoverTrigger,\n} from \"@/components/ui/popover\"\nimport {\n  DropdownMenu,\n  DropdownMenuCheckboxItem,\n  DropdownMenuContent,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuTrigger,\n} from \"@/components/ui/dropdown-menu\"\nimport { Separator } from \"@/components/ui/separator\"\n\nexport interface FilterOption {\n  label: string\n  value: string\n  icon?: React.ComponentType<{ className?: string }>\n  count?: number\n}\n\nexport interface DataTableToolbarProps {\n  searchValue?: string\n  onSearchChange?: (value: string) => void\n  searchPlaceholder?: string\n  filterTitle?: string\n  filterOptions?: FilterOption[]\n  selectedFilters?: string[]\n  onFilterToggle?: (value: string) => void\n  columns?: { id: string; label: string; visible: boolean }[]\n  onColumnToggle?: (columnId: string) => void\n  onResetFilters?: () => void\n  onExport?: () => void\n  onAdd?: () => void\n  addLabel?: string\n  className?: string\n}\n\nexport function DataTableToolbar({\n  searchValue = \"\",\n  onSearchChange,\n  searchPlaceholder = \"Filter records...\",\n  filterTitle = \"Status\",\n  filterOptions = [],\n  selectedFilters = [],\n  onFilterToggle,\n  columns = [],\n  onColumnToggle,\n  onResetFilters,\n  onExport,\n  onAdd,\n  addLabel = \"Add Record\",\n  className,\n}: DataTableToolbarProps) {\n  const isFiltered = searchValue.length > 0 || selectedFilters.length > 0\n\n  return (\n    <div className={cn(\"flex flex-wrap items-center justify-between gap-3\", className)}>\n      <div className=\"flex flex-1 flex-wrap items-center gap-2\">\n        {/* Search input */}\n        <div className=\"relative w-full sm:w-64\">\n          <Search className=\"absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground\" />\n          <Input\n            value={searchValue}\n            onChange={(e) => onSearchChange?.(e.target.value)}\n            placeholder={searchPlaceholder}\n            className=\"pl-9 h-9 text-xs\"\n          />\n          {searchValue && (\n            <button\n              onClick={() => onSearchChange?.(\"\")}\n              className=\"absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground\"\n            >\n              <X className=\"h-4 w-4\" />\n            </button>\n          )}\n        </div>\n\n        {/* Faceted Filter */}\n        {filterOptions.length > 0 && (\n          <Popover>\n            <PopoverTrigger asChild>\n              <Button variant=\"outline\" size=\"sm\" className=\"h-9 border-dashed text-xs gap-1.5\">\n                <span>{filterTitle}</span>\n                {selectedFilters.length > 0 && (\n                  <>\n                    <Separator orientation=\"vertical\" className=\"mx-1 h-4\" />\n                    <Badge variant=\"secondary\" className=\"rounded-sm px-1 font-normal text-[10px]\">\n                      {selectedFilters.length}\n                    </Badge>\n                  </>\n                )}\n              </Button>\n            </PopoverTrigger>\n            <PopoverContent className=\"w-52 p-1\" align=\"start\">\n              <div className=\"flex flex-col gap-1\">\n                {filterOptions.map((option) => {\n                  const isSelected = selectedFilters.includes(option.value)\n                  return (\n                    <button\n                      key={option.value}\n                      type=\"button\"\n                      onClick={() => onFilterToggle?.(option.value)}\n                      className={cn(\n                        \"flex items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors hover:bg-muted text-left\",\n                        isSelected && \"font-semibold text-foreground\"\n                      )}\n                    >\n                      <div\n                        className={cn(\n                          \"flex h-4 w-4 items-center justify-center rounded-sm border border-primary\",\n                          isSelected ? \"bg-primary text-primary-foreground\" : \"opacity-50\"\n                        )}\n                      >\n                        {isSelected && <Check className=\"h-3 w-3\" />}\n                      </div>\n                      <span className=\"flex-1 truncate\">{option.label}</span>\n                      {option.count !== undefined && (\n                        <span className=\"text-muted-foreground font-mono text-[10px]\">\n                          {option.count}\n                        </span>\n                      )}\n                    </button>\n                  )\n                })}\n              </div>\n            </PopoverContent>\n          </Popover>\n        )}\n\n        {/* Reset button */}\n        {isFiltered && onResetFilters && (\n          <Button\n            variant=\"ghost\"\n            size=\"sm\"\n            onClick={onResetFilters}\n            className=\"h-9 px-2 text-xs text-muted-foreground hover:text-foreground\"\n          >\n            Reset\n            <X className=\"ml-1 h-3.5 w-3.5\" />\n          </Button>\n        )}\n      </div>\n\n      <div className=\"flex items-center gap-2\">\n        {/* Column view options */}\n        {columns.length > 0 && onColumnToggle && (\n          <DropdownMenu>\n            <DropdownMenuTrigger asChild>\n              <Button variant=\"outline\" size=\"sm\" className=\"h-9 gap-1.5 text-xs\">\n                <SlidersHorizontal className=\"h-3.5 w-3.5\" />\n                <span>View</span>\n              </Button>\n            </DropdownMenuTrigger>\n            <DropdownMenuContent align=\"end\" className=\"w-44\">\n              <DropdownMenuLabel className=\"text-xs\">Toggle columns</DropdownMenuLabel>\n              <DropdownMenuSeparator />\n              {columns.map((column) => (\n                <DropdownMenuCheckboxItem\n                  key={column.id}\n                  checked={column.visible}\n                  onCheckedChange={() => onColumnToggle(column.id)}\n                  className=\"text-xs capitalize\"\n                >\n                  {column.label}\n                </DropdownMenuCheckboxItem>\n              ))}\n            </DropdownMenuContent>\n          </DropdownMenu>\n        )}\n\n        {/* Export button */}\n        {onExport && (\n          <Button variant=\"outline\" size=\"sm\" onClick={onExport} className=\"h-9 gap-1.5 text-xs\">\n            <Download className=\"h-3.5 w-3.5\" />\n            <span className=\"hidden sm:inline\">Export</span>\n          </Button>\n        )}\n\n        {/* Add CTA */}\n        {onAdd && (\n          <Button size=\"sm\" onClick={onAdd} className=\"h-9 gap-1.5 text-xs\">\n            <Plus className=\"h-3.5 w-3.5\" />\n            <span>{addLabel}</span>\n          </Button>\n        )}\n      </div>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/data-table-toolbar.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "empty-state",
+      "type": "registry:block",
+      "title": "Empty State",
+      "description": "Universal empty state placeholder with centered icon container, title, description, primary CTA button, and secondary link.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "button"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/empty-state.tsx",
+          "content": "import * as React from \"react\"\nimport { FolderPlus, LucideIcon } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\n\nexport interface EmptyStateProps {\n  icon?: LucideIcon | React.ComponentType<{ className?: string }>\n  title: string\n  description?: string\n  action?: {\n    label: string\n    onClick?: () => void\n    href?: string\n  }\n  secondaryAction?: {\n    label: string\n    onClick?: () => void\n    href?: string\n  }\n  className?: string\n  children?: React.ReactNode\n}\n\nexport function EmptyState({\n  icon: Icon = FolderPlus,\n  title,\n  description,\n  action,\n  secondaryAction,\n  className,\n  children,\n}: EmptyStateProps) {\n  return (\n    <div\n      className={cn(\n        \"flex min-h-[360px] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center animate-in fade-in-50\",\n        className\n      )}\n    >\n      <div className=\"mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted/60 text-muted-foreground ring-8 ring-muted/30\">\n        <Icon className=\"h-7 w-7\" />\n      </div>\n\n      <h3 className=\"mt-5 text-lg font-semibold tracking-tight text-foreground\">\n        {title}\n      </h3>\n\n      {description && (\n        <p className=\"mt-2 text-sm text-muted-foreground max-w-sm text-balance\">\n          {description}\n        </p>\n      )}\n\n      {(action || secondaryAction || children) && (\n        <div className=\"mt-6 flex flex-wrap items-center justify-center gap-3\">\n          {action && (\n            <Button\n              size=\"sm\"\n              onClick={action.onClick}\n              asChild={!!action.href}\n            >\n              {action.href ? <a href={action.href}>{action.label}</a> : action.label}\n            </Button>\n          )}\n\n          {secondaryAction && (\n            <Button\n              variant=\"outline\"\n              size=\"sm\"\n              onClick={secondaryAction.onClick}\n              asChild={!!secondaryAction.href}\n            >\n              {secondaryAction.href ? (\n                <a href={secondaryAction.href}>{secondaryAction.label}</a>\n              ) : (\n                secondaryAction.label\n              )}\n            </Button>\n          )}\n\n          {children}\n        </div>\n      )}\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/empty-state.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "command-menu",
+      "type": "registry:block",
+      "title": "Command Menu",
+      "description": "Universal ⌘K search palette with keyboard navigation, grouped commands, shortcut badges, and modal dialog.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "dialog",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/command-menu.tsx",
+          "content": "import * as React from \"react\"\nimport { Search, FileText, Settings, User, LogOut, Moon, Sun, Laptop } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Dialog, DialogContent } from \"@/components/ui/dialog\"\nimport { Input } from \"@/components/ui/input\"\n\nexport interface CommandItem {\n  id: string\n  title: string\n  icon?: React.ComponentType<{ className?: string }>\n  shortcut?: string\n  onSelect: () => void\n}\n\nexport interface CommandGroup {\n  heading: string\n  items: CommandItem[]\n}\n\nexport interface CommandMenuProps {\n  open: boolean\n  onOpenChange: (open: boolean) => void\n  groups?: CommandGroup[]\n  placeholder?: string\n}\n\nconst DEFAULT_GROUPS: CommandGroup[] = [\n  {\n    heading: \"Quick Navigation\",\n    items: [\n      { id: \"docs\", title: \"Documentation\", icon: FileText, shortcut: \"G D\", onSelect: () => {} },\n      { id: \"settings\", title: \"Project Settings\", icon: Settings, shortcut: \"G S\", onSelect: () => {} },\n      { id: \"profile\", title: \"User Profile\", icon: User, shortcut: \"G P\", onSelect: () => {} },\n    ],\n  },\n  {\n    heading: \"System Actions\",\n    items: [\n      { id: \"logout\", title: \"Log out\", icon: LogOut, onSelect: () => {} },\n    ],\n  },\n]\n\nexport function CommandMenu({\n  open,\n  onOpenChange,\n  groups = DEFAULT_GROUPS,\n  placeholder = \"Type a command or search...\",\n}: CommandMenuProps) {\n  const [query, setQuery] = React.useState(\"\")\n\n  React.useEffect(() => {\n    const down = (e: KeyboardEvent) => {\n      if (e.key === \"k\" && (e.metaKey || e.ctrlKey)) {\n        e.preventDefault()\n        onOpenChange(!open)\n      }\n    }\n\n    document.addEventListener(\"keydown\", down)\n    return () => document.removeEventListener(\"keydown\", down)\n  }, [open, onOpenChange])\n\n  const filteredGroups = groups\n    .map((group) => ({\n      ...group,\n      items: group.items.filter((item) =>\n        item.title.toLowerCase().includes(query.toLowerCase())\n      ),\n    }))\n    .filter((group) => group.items.length > 0)\n\n  return (\n    <Dialog open={open} onOpenChange={onOpenChange}>\n      <DialogContent className=\"overflow-hidden p-0 max-w-xl shadow-2xl\">\n        <div className=\"flex items-center border-b px-3\">\n          <Search className=\"mr-2 h-4 w-4 shrink-0 text-muted-foreground\" />\n          <input\n            className=\"flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50\"\n            placeholder={placeholder}\n            value={query}\n            onChange={(e) => setQuery(e.target.value)}\n          />\n        </div>\n\n        <div className=\"max-h-[300px] overflow-y-auto p-2\">\n          {filteredGroups.length === 0 ? (\n            <p className=\"p-4 text-center text-sm text-muted-foreground\">\n              No results found for &ldquo;{query}&rdquo;.\n            </p>\n          ) : (\n            filteredGroups.map((group, idx) => (\n              <div key={idx} className=\"mb-2 last:mb-0\">\n                <span className=\"px-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground\">\n                  {group.heading}\n                </span>\n                <div className=\"mt-1 flex flex-col gap-0.5\">\n                  {group.items.map((item) => {\n                    const Icon = item.icon\n                    return (\n                      <button\n                        key={item.id}\n                        type=\"button\"\n                        onClick={() => {\n                          item.onSelect()\n                          onOpenChange(false)\n                        }}\n                        className=\"flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-foreground transition-colors hover:bg-accent hover:text-accent-foreground text-left\"\n                      >\n                        {Icon && <Icon className=\"h-4 w-4 shrink-0 text-muted-foreground\" />}\n                        <span className=\"flex-1 truncate\">{item.title}</span>\n                        {item.shortcut && (\n                          <kbd className=\"pointer-events-none rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground\">\n                            {item.shortcut}\n                          </kbd>\n                        )}\n                      </button>\n                    )\n                  })}\n                </div>\n              </div>\n            ))\n          )}\n        </div>\n\n        <div className=\"border-t bg-muted/40 px-3 py-2 flex items-center justify-between text-[11px] text-muted-foreground\">\n          <span>Navigate with arrows</span>\n          <span>Esc to close</span>\n        </div>\n      </DialogContent>\n    </Dialog>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/command-menu.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "confirm-dialog",
+      "type": "registry:block",
+      "title": "Confirm Dialog",
+      "description": "Universal confirmation modal for destructive or critical actions with optional type-to-confirm input and loading spinner.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "dialog",
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/confirm-dialog.tsx",
+          "content": "import * as React from \"react\"\nimport { AlertTriangle, Loader2 } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport {\n  Dialog,\n  DialogContent,\n  DialogDescription,\n  DialogFooter,\n  DialogHeader,\n  DialogTitle,\n} from \"@/components/ui/dialog\"\nimport { Button } from \"@/components/ui/button\"\nimport { Input } from \"@/components/ui/input\"\n\nexport interface ConfirmDialogProps {\n  open: boolean\n  onOpenChange: (open: boolean) => void\n  title: string\n  description: string\n  confirmText?: string\n  cancelText?: string\n  variant?: \"destructive\" | \"default\"\n  requireConfirmationText?: string\n  loading?: boolean\n  onConfirm: () => void | Promise<void>\n}\n\nexport function ConfirmDialog({\n  open,\n  onOpenChange,\n  title,\n  description,\n  confirmText = \"Delete\",\n  cancelText = \"Cancel\",\n  variant = \"destructive\",\n  requireConfirmationText,\n  loading = false,\n  onConfirm,\n}: ConfirmDialogProps) {\n  const [inputText, setInputText] = React.useState(\"\")\n  const isMatch = requireConfirmationText ? inputText === requireConfirmationText : true\n\n  React.useEffect(() => {\n    if (!open) {\n      setInputText(\"\")\n    }\n  }, [open])\n\n  return (\n    <Dialog open={open} onOpenChange={onOpenChange}>\n      <DialogContent className=\"max-w-md\">\n        <DialogHeader className=\"gap-2 sm:text-left\">\n          <div className=\"flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive ring-8 ring-destructive/5\">\n            <AlertTriangle className=\"h-5 w-5\" />\n          </div>\n          <DialogTitle className=\"text-lg\">{title}</DialogTitle>\n          <DialogDescription className=\"text-sm\">{description}</DialogDescription>\n        </DialogHeader>\n\n        {requireConfirmationText && (\n          <div className=\"my-2 space-y-2\">\n            <p className=\"text-xs text-muted-foreground\">\n              Please type <span className=\"font-semibold text-foreground\">{requireConfirmationText}</span> to confirm:\n            </p>\n            <Input\n              value={inputText}\n              onChange={(e) => setInputText(e.target.value)}\n              placeholder={requireConfirmationText}\n              className=\"text-xs\"\n              autoFocus\n            />\n          </div>\n        )}\n\n        <DialogFooter className=\"gap-2 sm:gap-0 mt-4\">\n          <Button\n            variant=\"outline\"\n            size=\"sm\"\n            onClick={() => onOpenChange(false)}\n            disabled={loading}\n          >\n            {cancelText}\n          </Button>\n          <Button\n            variant={variant}\n            size=\"sm\"\n            onClick={onConfirm}\n            disabled={!isMatch || loading}\n          >\n            {loading && <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />}\n            {confirmText}\n          </Button>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/confirm-dialog.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "filter-bar",
+      "type": "registry:block",
+      "title": "Filter Bar",
+      "description": "Universal active filter chips toolbar with badges, individual remove buttons, total count, and clear-all action.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "badge",
+        "button"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/filter-bar.tsx",
+          "content": "import * as React from \"react\"\nimport { X } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Badge } from \"@/components/ui/badge\"\nimport { Button } from \"@/components/ui/button\"\n\nexport interface ActiveFilter {\n  id: string\n  label: string\n  value: string\n  displayValue?: string\n}\n\nexport interface FilterBarProps {\n  filters: ActiveFilter[]\n  onRemove: (filterId: string) => void\n  onClearAll: () => void\n  className?: string\n}\n\nexport function FilterBar({\n  filters,\n  onRemove,\n  onClearAll,\n  className,\n}: FilterBarProps) {\n  if (filters.length === 0) return null\n\n  return (\n    <div className={cn(\"flex flex-wrap items-center gap-2 py-2\", className)}>\n      <span className=\"text-xs font-medium text-muted-foreground\">\n        Active filters ({filters.length}):\n      </span>\n\n      <div className=\"flex flex-wrap items-center gap-1.5\">\n        {filters.map((filter) => (\n          <Badge\n            key={filter.id}\n            variant=\"secondary\"\n            className=\"gap-1.5 py-1 pl-2 pr-1 text-xs font-normal\"\n          >\n            <span className=\"font-medium text-foreground\">{filter.label}:</span>\n            <span className=\"text-muted-foreground\">{filter.displayValue ?? filter.value}</span>\n            <button\n              type=\"button\"\n              onClick={() => onRemove(filter.id)}\n              className=\"ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 text-muted-foreground hover:text-foreground\"\n            >\n              <X className=\"h-3 w-3\" />\n              <span className=\"sr-only\">Remove {filter.label} filter</span>\n            </button>\n          </Badge>\n        ))}\n      </div>\n\n      <Button\n        variant=\"ghost\"\n        size=\"sm\"\n        onClick={onClearAll}\n        className=\"h-7 px-2 text-xs text-muted-foreground hover:text-foreground\"\n      >\n        Clear all\n      </Button>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/filter-bar.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "page-header",
+      "type": "registry:block",
+      "title": "Page Header",
+      "description": "Universal page header with breadcrumbs trail, page title, status badge, description, and action button group.",
+      "dependencies": [],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/page-header.tsx",
+          "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\n\nexport interface PageHeaderProps {\n  breadcrumbs?: React.ReactNode\n  title: string\n  description?: string\n  badge?: React.ReactNode\n  actions?: React.ReactNode\n  className?: string\n}\n\nexport function PageHeader({\n  breadcrumbs,\n  title,\n  description,\n  badge,\n  actions,\n  className,\n}: PageHeaderProps) {\n  return (\n    <div className={cn(\"flex flex-col gap-4 pb-6 border-b\", className)}>\n      {breadcrumbs && <div>{breadcrumbs}</div>}\n\n      <div className=\"flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between\">\n        <div className=\"space-y-1\">\n          <div className=\"flex items-center gap-2\">\n            <h1 className=\"text-2xl font-bold tracking-tight text-foreground md:text-3xl\">\n              {title}\n            </h1>\n            {badge}\n          </div>\n          {description && (\n            <p className=\"text-sm text-muted-foreground max-w-2xl text-balance\">\n              {description}\n            </p>\n          )}\n        </div>\n\n        {actions && (\n          <div className=\"flex items-center gap-2 pt-2 sm:pt-0\">\n            {actions}\n          </div>\n        )}\n      </div>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/page-header.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "user-profile-menu",
+      "type": "registry:block",
+      "title": "User Profile Menu",
+      "description": "Universal user avatar dropdown menu with profile details, settings, nested theme selector (light/dark/system), and logout.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "avatar",
+        "button",
+        "dropdown-menu",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/user-profile-menu.tsx",
+          "content": "import * as React from \"react\"\nimport {\n  User,\n  CreditCard,\n  Settings,\n  Users,\n  Keyboard,\n  Moon,\n  Sun,\n  Laptop,\n  LogOut,\n} from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\nimport { Button } from \"@/components/ui/button\"\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuGroup,\n  DropdownMenuItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuShortcut,\n  DropdownMenuSub,\n  DropdownMenuSubContent,\n  DropdownMenuSubTrigger,\n  DropdownMenuTrigger,\n} from \"@/components/ui/dropdown-menu\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport interface UserProfileMenuProps {\n  user: {\n    name: string\n    email: string\n    avatar?: string\n    role?: string\n    initials?: string\n  }\n  onNavigate?: (path: string) => void\n  onThemeSelect?: (theme: \"light\" | \"dark\" | \"system\") => void\n  onLogout?: () => void\n  align?: \"start\" | \"center\" | \"end\"\n}\n\nexport function UserProfileMenu({\n  user,\n  onNavigate,\n  onThemeSelect,\n  onLogout,\n  align = \"end\",\n}: UserProfileMenuProps) {\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"ghost\" className=\"relative h-9 w-9 rounded-full p-0\">\n          <Avatar className=\"h-9 w-9\">\n            {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}\n            <AvatarFallback>{user.initials ?? user.name.slice(0, 2).toUpperCase()}</AvatarFallback>\n          </Avatar>\n        </Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"w-56\" align={align} forceMount>\n        <DropdownMenuLabel className=\"font-normal\">\n          <div className=\"flex flex-col space-y-1\">\n            <div className=\"flex items-center justify-between\">\n              <p className=\"text-sm font-semibold leading-none\">{user.name}</p>\n              {user.role && (\n                <Badge variant=\"outline\" className=\"text-[10px] px-1 py-0 uppercase\">\n                  {user.role}\n                </Badge>\n              )}\n            </div>\n            <p className=\"text-xs leading-none text-muted-foreground truncate\">\n              {user.email}\n            </p>\n          </div>\n        </DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuGroup>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/profile\")}>\n            <User className=\"mr-2 h-4 w-4\" />\n            <span>Profile</span>\n            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/billing\")}>\n            <CreditCard className=\"mr-2 h-4 w-4\" />\n            <span>Billing</span>\n            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/settings\")}>\n            <Settings className=\"mr-2 h-4 w-4\" />\n            <span>Settings</span>\n            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem onClick={() => onNavigate?.(\"/team\")}>\n            <Users className=\"mr-2 h-4 w-4\" />\n            <span>Team</span>\n          </DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        {onThemeSelect && (\n          <DropdownMenuSub>\n            <DropdownMenuSubTrigger>\n              <Sun className=\"mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0\" />\n              <Moon className=\"absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100\" />\n              <span>Theme</span>\n            </DropdownMenuSubTrigger>\n            <DropdownMenuSubContent>\n              <DropdownMenuItem onClick={() => onThemeSelect(\"light\")}>\n                <Sun className=\"mr-2 h-4 w-4\" />\n                <span>Light</span>\n              </DropdownMenuItem>\n              <DropdownMenuItem onClick={() => onThemeSelect(\"dark\")}>\n                <Moon className=\"mr-2 h-4 w-4\" />\n                <span>Dark</span>\n              </DropdownMenuItem>\n              <DropdownMenuItem onClick={() => onThemeSelect(\"system\")}>\n                <Laptop className=\"mr-2 h-4 w-4\" />\n                <span>System</span>\n              </DropdownMenuItem>\n            </DropdownMenuSubContent>\n          </DropdownMenuSub>\n        )}\n        <DropdownMenuSeparator />\n        <DropdownMenuItem onClick={onLogout} className=\"text-destructive focus:text-destructive\">\n          <LogOut className=\"mr-2 h-4 w-4\" />\n          <span>Log out</span>\n          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>\n        </DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/user-profile-menu.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "activity-feed",
+      "type": "registry:block",
+      "title": "Activity Feed",
+      "description": "Universal chronological activity timeline with actor avatars, event icons, action descriptions, timestamps, and detail panels.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "devDependencies": [],
+      "registryDependencies": [
+        "utils",
+        "avatar",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/activity-feed.tsx",
+          "content": "import * as React from \"react\"\nimport { CircleDot, LucideIcon } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport interface ActivityEvent {\n  id: string\n  actor: {\n    name: string\n    avatar?: string\n    initials?: string\n  }\n  action: string\n  target?: string\n  timestamp: string\n  icon?: LucideIcon | React.ComponentType<{ className?: string }>\n  badge?: {\n    label: string\n    variant?: \"default\" | \"secondary\" | \"outline\" | \"success\" | \"warning\" | \"destructive\"\n  }\n  details?: string\n}\n\nexport interface ActivityFeedProps {\n  events: ActivityEvent[]\n  className?: string\n}\n\nexport function ActivityFeed({ events, className }: ActivityFeedProps) {\n  if (events.length === 0) {\n    return (\n      <div className=\"py-8 text-center text-xs text-muted-foreground\">\n        No recent activity.\n      </div>\n    )\n  }\n\n  return (\n    <div className={cn(\"flow-root\", className)}>\n      <ul className=\"-mb-8\">\n        {events.map((event, idx) => {\n          const isLast = idx === events.length - 1\n          const Icon = event.icon\n\n          return (\n            <li key={event.id}>\n              <div className=\"relative pb-8\">\n                {!isLast && (\n                  <span\n                    className=\"absolute left-4 top-4 -ml-px h-full w-0.5 bg-border\"\n                    aria-hidden=\"true\"\n                  />\n                )}\n                <div className=\"relative flex items-start space-x-3\">\n                  {/* Avatar or Icon */}\n                  <div className=\"relative\">\n                    <Avatar className=\"h-8 w-8 ring-4 ring-background\">\n                      {event.actor.avatar && (\n                        <AvatarImage src={event.actor.avatar} alt={event.actor.name} />\n                      )}\n                      <AvatarFallback className=\"text-xs\">\n                        {event.actor.initials ?? event.actor.name.slice(0, 2).toUpperCase()}\n                      </AvatarFallback>\n                    </Avatar>\n                    {Icon && (\n                      <span className=\"absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground\">\n                        <Icon className=\"h-2.5 w-2.5\" />\n                      </span>\n                    )}\n                  </div>\n\n                  {/* Content */}\n                  <div className=\"min-w-0 flex-1 pt-0.5\">\n                    <div className=\"flex flex-wrap items-center justify-between gap-1\">\n                      <p className=\"text-xs text-muted-foreground\">\n                        <span className=\"font-semibold text-foreground\">\n                          {event.actor.name}\n                        </span>{\" \"}\n                        {event.action}{\" \"}\n                        {event.target && (\n                          <span className=\"font-medium text-foreground\">\n                            {event.target}\n                          </span>\n                        )}\n                      </p>\n                      <time className=\"text-[11px] text-muted-foreground whitespace-nowrap\">\n                        {event.timestamp}\n                      </time>\n                    </div>\n\n                    {event.badge && (\n                      <div className=\"mt-1\">\n                        <Badge\n                          variant={event.badge.variant ?? \"secondary\"}\n                          className=\"text-[10px] px-1.5 py-0\"\n                        >\n                          {event.badge.label}\n                        </Badge>\n                      </div>\n                    )}\n\n                    {event.details && (\n                      <p className=\"mt-1 rounded-md bg-muted/50 p-2 text-xs text-muted-foreground\">\n                        {event.details}\n                      </p>\n                    )}\n                  </div>\n                </div>\n              </div>\n            </li>\n          )\n        })}\n      </ul>\n    </div>\n  )\n}\n",
+          "type": "registry:block",
+          "target": "components/blocks/activity-feed.tsx"
+        }
+      ],
+      "tailwind": {},
+      "cssVars": {}
+    }
+  ]
+}

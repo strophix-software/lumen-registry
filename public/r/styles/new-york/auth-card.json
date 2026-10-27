@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "auth-card",
+  "type": "registry:block",
+  "title": "Auth Card Layout",
+  "description": "Centered clean authentication card layout with brand logo, social login buttons, separator, and footer link.",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "utils",
+    "card",
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/auth-card.tsx",
+      "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\nimport {\n  Card,\n  CardContent,\n  CardDescription,\n  CardFooter,\n  CardHeader,\n  CardTitle,\n} from \"@/components/ui/card\"\nimport { Button } from \"@/components/ui/button\"\n\nexport interface AuthCardProps {\n  brand?: {\n    name: string\n    logo?: React.ReactNode\n  }\n  title?: string\n  description?: string\n  socialProviders?: {\n    name: string\n    icon: React.ComponentType<{ className?: string }>\n    onClick: () => void\n  }[]\n  footerAction?: {\n    text: string\n    linkText: string\n    href: string\n  }\n  children: React.ReactNode\n}\n\nexport function AuthCard({\n  brand = { name: \"Lumen\" },\n  title = \"Welcome back\",\n  description = \"Enter your credentials to access your account\",\n  socialProviders,\n  footerAction = {\n    text: \"Don't have an account?\",\n    linkText: \"Sign up\",\n    href: \"#signup\",\n  },\n  children,\n}: AuthCardProps) {\n  return (\n    <div className=\"flex min-h-screen items-center justify-center bg-muted/40 p-4 sm:p-8 text-foreground\">\n      <div className=\"w-full max-w-md\">\n        {/* Centered Brand Icon */}\n        <div className=\"mb-6 flex flex-col items-center gap-2 text-center\">\n          {brand.logo ?? (\n            <div className=\"flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-lg shadow-sm\">\n              L\n            </div>\n          )}\n          <span className=\"font-semibold text-sm tracking-tight text-muted-foreground\">\n            {brand.name}\n          </span>\n        </div>\n\n        <Card className=\"border-border/60 shadow-lg\">\n          <CardHeader className=\"space-y-1 text-center\">\n            <CardTitle className=\"text-xl font-bold tracking-tight\">{title}</CardTitle>\n            {description && <CardDescription>{description}</CardDescription>}\n          </CardHeader>\n\n          <CardContent className=\"space-y-4\">\n            {socialProviders && socialProviders.length > 0 && (\n              <>\n                <div className=\"grid grid-cols-1 gap-2\">\n                  {socialProviders.map((provider, idx) => {\n                    const Icon = provider.icon\n                    return (\n                      <Button\n                        key={idx}\n                        variant=\"outline\"\n                        className=\"w-full gap-2 text-xs font-medium\"\n                        onClick={provider.onClick}\n                      >\n                        <Icon className=\"h-4 w-4\" />\n                        <span>Continue with {provider.name}</span>\n                      </Button>\n                    )\n                  })}\n                </div>\n\n                <div className=\"relative\">\n                  <div className=\"absolute inset-0 flex items-center\">\n                    <span className=\"w-full border-t\" />\n                  </div>\n                  <div className=\"relative flex justify-center text-xs uppercase\">\n                    <span className=\"bg-card px-2 text-muted-foreground font-medium\">\n                      Or continue with\n                    </span>\n                  </div>\n                </div>\n              </>\n            )}\n\n            {children}\n          </CardContent>\n\n          {footerAction && (\n            <CardFooter className=\"flex justify-center border-t py-4 text-xs text-muted-foreground\">\n              <span>{footerAction.text} </span>\n              <a\n                href={footerAction.href}\n                className=\"ml-1 font-semibold text-foreground underline underline-offset-4 hover:opacity-80\"\n              >\n                {footerAction.linkText}\n              </a>\n            </CardFooter>\n          )}\n        </Card>\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:block",
+      "target": "components/blocks/auth-card.tsx"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {}
+}

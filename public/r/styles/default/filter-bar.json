@@ -1,0 +1,26 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "filter-bar",
+  "type": "registry:block",
+  "title": "Filter Bar",
+  "description": "Universal active filter chips toolbar with badges, individual remove buttons, total count, and clear-all action.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "devDependencies": [],
+  "registryDependencies": [
+    "utils",
+    "badge",
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/filter-bar.tsx",
+      "content": "import * as React from \"react\"\nimport { X } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Badge } from \"@/components/ui/badge\"\nimport { Button } from \"@/components/ui/button\"\n\nexport interface ActiveFilter {\n  id: string\n  label: string\n  value: string\n  displayValue?: string\n}\n\nexport interface FilterBarProps {\n  filters: ActiveFilter[]\n  onRemove: (filterId: string) => void\n  onClearAll: () => void\n  className?: string\n}\n\nexport function FilterBar({\n  filters,\n  onRemove,\n  onClearAll,\n  className,\n}: FilterBarProps) {\n  if (filters.length === 0) return null\n\n  return (\n    <div className={cn(\"flex flex-wrap items-center gap-2 py-2\", className)}>\n      <span className=\"text-xs font-medium text-muted-foreground\">\n        Active filters ({filters.length}):\n      </span>\n\n      <div className=\"flex flex-wrap items-center gap-1.5\">\n        {filters.map((filter) => (\n          <Badge\n            key={filter.id}\n            variant=\"secondary\"\n            className=\"gap-1.5 py-1 pl-2 pr-1 text-xs font-normal\"\n          >\n            <span className=\"font-medium text-foreground\">{filter.label}:</span>\n            <span className=\"text-muted-foreground\">{filter.displayValue ?? filter.value}</span>\n            <button\n              type=\"button\"\n              onClick={() => onRemove(filter.id)}\n              className=\"ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 text-muted-foreground hover:text-foreground\"\n            >\n              <X className=\"h-3 w-3\" />\n              <span className=\"sr-only\">Remove {filter.label} filter</span>\n            </button>\n          </Badge>\n        ))}\n      </div>\n\n      <Button\n        variant=\"ghost\"\n        size=\"sm\"\n        onClick={onClearAll}\n        className=\"h-7 px-2 text-xs text-muted-foreground hover:text-foreground\"\n      >\n        Clear all\n      </Button>\n    </div>\n  )\n}\n",
+      "type": "registry:block",
+      "target": "components/blocks/filter-bar.tsx"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {}
+}
